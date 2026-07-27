@@ -1,0 +1,664 @@
+<title>The State of America's Health</title>
+<style>
+  :root {
+    --bg: #f7f9fb; --panel: #ffffff; --panel-2: #f2f6f9;
+    --ink: #13202b; --ink-soft: #35485a; --muted: #5f7183; --faint: #8496a6;
+    --hairline: #e3e9ee; --hairline-strong: #d3dbe2;
+    --accent: #1f5f9e; --accent-soft: #eaf1f8;
+    --bar-lo: #cce0f1; --bar-hi: #1f5f9e;
+    --good: #2f8f6b; --good-soft: #e6f3ee;
+    --shadow: 0 1px 2px rgba(19,32,43,.05), 0 8px 24px rgba(19,32,43,.06);
+    --f-display: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+    --f-body: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --f-num: "SF Mono", ui-monospace, "Cascadia Mono", "Roboto Mono", Menlo, monospace;
+    --maxw: 980px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0e141a; --panel: #161e26; --panel-2: #1b242d;
+      --ink: #e9eff4; --ink-soft: #c2ced8; --muted: #93a4b3; --faint: #6f8291;
+      --hairline: #253039; --hairline-strong: #31404b;
+      --accent: #6aa9e6; --accent-soft: #17242f;
+      --bar-lo: #253a4b; --bar-hi: #5ea3e2;
+      --good: #4bb98c; --good-soft: #142720;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 28px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="light"]{--bg:#f7f9fb;--panel:#fff;--panel-2:#f2f6f9;--ink:#13202b;--ink-soft:#35485a;--muted:#5f7183;--faint:#8496a6;--hairline:#e3e9ee;--hairline-strong:#d3dbe2;--accent:#1f5f9e;--accent-soft:#eaf1f8;--bar-lo:#cce0f1;--bar-hi:#1f5f9e;--good:#2f8f6b;--good-soft:#e6f3ee;--shadow:0 1px 2px rgba(19,32,43,.05),0 8px 24px rgba(19,32,43,.06);}
+  :root[data-theme="dark"]{--bg:#0e141a;--panel:#161e26;--panel-2:#1b242d;--ink:#e9eff4;--ink-soft:#c2ced8;--muted:#93a4b3;--faint:#6f8291;--hairline:#253039;--hairline-strong:#31404b;--accent:#6aa9e6;--accent-soft:#17242f;--bar-lo:#253a4b;--bar-hi:#5ea3e2;--good:#4bb98c;--good-soft:#142720;--shadow:0 1px 2px rgba(0,0,0,.3),0 10px 28px rgba(0,0,0,.35);}
+
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font-family:var(--f-body); line-height:1.55; -webkit-font-smoothing:antialiased; }
+  .wrap { max-width:var(--maxw); margin:0 auto; padding:48px 22px 88px; }
+  a { color:var(--accent); }
+
+  .eyebrow { font-size:.72rem; letter-spacing:.16em; text-transform:uppercase; color:var(--accent); font-weight:650; margin:0 0 12px; }
+  h1 { font-family:var(--f-display); font-weight:600; font-size:clamp(2rem,5.4vw,3.25rem); line-height:1.04; letter-spacing:-.01em; text-wrap:balance; margin:0 0 16px; }
+  .dek { font-size:1.08rem; color:var(--ink-soft); max-width:62ch; margin:0 0 20px; text-wrap:pretty; }
+  .vintage { display:flex; flex-wrap:wrap; gap:8px 18px; font-size:.8rem; color:var(--muted); border-top:1px solid var(--hairline); padding-top:14px; }
+  .vintage b { color:var(--ink-soft); font-weight:600; }
+
+  /* Tabs */
+  .tabs { position:sticky; top:0; z-index:20; display:flex; flex-wrap:wrap; gap:4px; margin:30px 0 34px; padding:8px 0; background:linear-gradient(var(--bg) 72%, transparent); }
+  .tab { font-family:var(--f-body); font-size:.9rem; font-weight:600; color:var(--muted); background:transparent; border:1px solid transparent; border-radius:9px; padding:9px 15px; cursor:pointer; white-space:nowrap; }
+  .tab:hover { color:var(--ink); background:var(--panel-2); }
+  .tab[aria-selected="true"] { color:var(--accent); background:var(--accent-soft); border-color:var(--hairline-strong); }
+  .tab:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+
+  .view { display:none; }
+  .view.on { display:block; animation:fade .2s ease; }
+  @keyframes fade { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:none} }
+
+  .sec-head { margin:0 0 6px; display:flex; align-items:baseline; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+  .sec-head h2 { font-family:var(--f-display); font-weight:600; font-size:1.5rem; letter-spacing:-.01em; margin:0; }
+  .sec-note { font-size:.86rem; color:var(--muted); margin:0 0 22px; max-width:74ch; }
+  .sec-note b { color:var(--ink-soft); }
+
+  .toggle { font-family:var(--f-body); font-size:.8rem; font-weight:600; color:var(--accent); background:var(--accent-soft); border:1px solid var(--hairline-strong); border-radius:999px; padding:6px 14px; cursor:pointer; white-space:nowrap; }
+  .toggle:hover { border-color:var(--accent); }
+  .toggle:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+
+  /* Hero stats */
+  .stats { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin:0 0 40px; }
+  .stat { background:var(--panel); border:1px solid var(--hairline); border-radius:12px; padding:20px; box-shadow:var(--shadow); }
+  .stat .big { font-family:var(--f-display); font-size:2.4rem; line-height:1; font-weight:600; letter-spacing:-.02em; color:var(--accent); font-variant-numeric:tabular-nums; }
+  .stat .lab { margin-top:8px; font-size:.9rem; color:var(--ink-soft); }
+  .stat .sub { margin-top:3px; font-size:.76rem; color:var(--faint); }
+
+  /* Chart / bars */
+  .chart { background:var(--panel); border:1px solid var(--hairline); border-radius:14px; padding:22px 24px 14px; box-shadow:var(--shadow); position:relative; }
+  .axis { position:relative; height:18px; margin-left:var(--labw); margin-bottom:6px; border-bottom:1px solid var(--hairline); }
+  .tick { position:absolute; top:0; bottom:-6px; transform:translateX(-50%); }
+  .tick span { position:absolute; top:0; left:50%; transform:translateX(-50%); font-size:.68rem; color:var(--faint); font-variant-numeric:tabular-nums; }
+  .tick i { position:absolute; top:16px; height:var(--tickh,600px); left:50%; width:1px; background:var(--hairline); }
+  .row { --labw:210px; display:grid; grid-template-columns:var(--labw) 1fr; align-items:center; padding:5px 0; }
+  .row .name { padding-right:14px; font-size:.9rem; line-height:1.2; display:flex; flex-direction:column; gap:2px; text-align:right; }
+  .row .name .cat { font-size:.62rem; letter-spacing:.09em; text-transform:uppercase; color:var(--faint); font-weight:600; }
+  .track { position:relative; height:26px; }
+  .barwrap { position:relative; height:100%; }
+  .bar { height:100%; border-radius:3px 5px 5px 3px; background:color-mix(in oklab, var(--bar-hi), var(--bar-lo) calc((1 - var(--t)) * 100%)); width:var(--w); min-width:3px; transition:filter .12s ease, width .5s ease; }
+  .row:hover .bar, .row:focus-within .bar { filter:saturate(1.15) brightness(1.05); }
+  .val { position:absolute; top:50%; transform:translateY(-50%); left:calc(var(--w) + 8px); font-family:var(--f-num); font-size:.82rem; font-weight:600; color:var(--ink-soft); font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .row.hi .val { color:var(--accent); }
+  .axis-cap { margin-left:var(--labw); font-size:.72rem; color:var(--faint); padding-top:6px; }
+
+  /* Tooltip */
+  #tip { position:fixed; z-index:60; pointer-events:none; opacity:0; background:var(--ink); color:var(--bg); border-radius:9px; padding:10px 12px; max-width:250px; box-shadow:0 8px 30px rgba(0,0,0,.28); font-size:.79rem; line-height:1.4; transition:opacity .1s ease; }
+  #tip.on { opacity:1; }
+  #tip .tname { font-weight:700; font-size:.85rem; margin-bottom:2px; }
+  #tip .tpct { font-family:var(--f-num); font-weight:700; }
+  #tip .tmeta { color:color-mix(in oklab, var(--bg), var(--ink) 34%); margin-top:5px; font-size:.71rem; }
+
+  /* Age view */
+  .agegrid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+  .agecard { background:var(--panel); border:1px solid var(--hairline); border-radius:14px; padding:20px; box-shadow:var(--shadow); }
+  .agecard h3 { margin:0 0 2px; font-family:var(--f-body); font-size:1.02rem; font-weight:650; }
+  .agecard .csrc { font-size:.7rem; color:var(--faint); margin-bottom:16px; }
+  .agebars { display:flex; align-items:flex-end; gap:12px; height:180px; }
+  .agebar { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; height:100%; }
+  .agebar .col { width:100%; border-radius:5px 5px 0 0; background:color-mix(in oklab, var(--bar-hi), var(--bar-lo) calc((1 - var(--t)) * 100%)); min-height:4px; transition:height .5s ease; }
+  .agebar .av { font-family:var(--f-num); font-weight:700; font-size:.9rem; margin-bottom:6px; color:var(--ink-soft); font-variant-numeric:tabular-nums; }
+  .agebar .al { margin-top:8px; font-size:.72rem; color:var(--muted); text-align:center; }
+  .agebar .al b { display:block; color:var(--ink); font-size:.78rem; }
+
+  /* Trend small multiples */
+  .smgrid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+  .sm { background:var(--panel); border:1px solid var(--hairline); border-radius:12px; padding:16px 16px 12px; box-shadow:var(--shadow); }
+  .sm .top { display:flex; justify-content:space-between; align-items:baseline; gap:8px; }
+  .sm .lbl { font-size:.88rem; font-weight:650; }
+  .sm .now { font-family:var(--f-num); font-size:1.15rem; font-weight:700; color:var(--accent); font-variant-numeric:tabular-nums; }
+  .sm svg { display:block; width:100%; height:52px; margin:10px 0 6px; overflow:visible; }
+  .sm .foot { display:flex; justify-content:space-between; font-size:.68rem; color:var(--faint); font-variant-numeric:tabular-nums; }
+  .sm .delta { font-weight:650; }
+  .sm .delta.up { color:var(--accent); }
+  .sm .delta.dn { color:var(--good); }
+
+  /* State view */
+  /* Download toolbar */
+  .dl-toolbar { display:flex; align-items:center; gap:8px; margin:-18px 0 30px; flex-wrap:wrap; }
+  .dl-lbl { font-size:.72rem; letter-spacing:.09em; text-transform:uppercase; color:var(--faint); font-weight:600; margin-right:2px; }
+  .dl-btn { font-family:var(--f-body); font-size:.8rem; font-weight:600; color:var(--ink-soft); background:var(--panel); border:1px solid var(--hairline-strong); border-radius:8px; padding:6px 12px; cursor:pointer; }
+  .dl-btn:hover { border-color:var(--accent); color:var(--accent); }
+  .dl-btn:disabled { opacity:.5; cursor:default; }
+  .dl-btn:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+  .dl-status { font-size:.78rem; color:var(--muted); }
+  .dl-status.err { color:#c0563f; }
+  /* Sex / segmented toggle */
+  .subsel-row { display:flex; align-items:center; gap:10px; margin-bottom:18px; }
+  .subsel-lbl { font-size:.72rem; letter-spacing:.09em; text-transform:uppercase; color:var(--faint); font-weight:600; }
+  .subsel { display:inline-flex; background:var(--panel-2); border:1px solid var(--hairline-strong); border-radius:9px; padding:3px; gap:2px; }
+  .segbtn { font-family:var(--f-body); font-size:.8rem; font-weight:600; color:var(--muted); background:transparent; border:none; border-radius:7px; padding:5px 13px; cursor:pointer; }
+  .segbtn:hover { color:var(--ink); }
+  .segbtn[aria-pressed="true"] { color:var(--accent); background:var(--panel); box-shadow:0 1px 2px rgba(0,0,0,.08); }
+  .segbtn:focus-visible { outline:2px solid var(--accent); outline-offset:1px; }
+  .selector { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:18px; }
+  .chip { font-family:var(--f-body); font-size:.8rem; font-weight:600; color:var(--muted); background:var(--panel); border:1px solid var(--hairline-strong); border-radius:999px; padding:6px 13px; cursor:pointer; }
+  .chip:hover { color:var(--ink); border-color:var(--accent); }
+  .chip[aria-pressed="true"] { color:#fff; background:var(--accent); border-color:var(--accent); }
+  :root[data-theme="dark"] .chip[aria-pressed="true"], @media (prefers-color-scheme:dark){ .chip[aria-pressed="true"]{ color:#0e141a; } }
+  .statewrap { display:grid; grid-template-columns:1.15fr .85fr; gap:22px; align-items:start; }
+  .mapcard { background:var(--panel); border:1px solid var(--hairline); border-radius:14px; padding:20px; box-shadow:var(--shadow); }
+  .mapmeta { display:flex; flex-wrap:wrap; gap:6px 16px; font-size:.8rem; color:var(--muted); margin-bottom:14px; }
+  .mapmeta b { color:var(--ink); font-variant-numeric:tabular-nums; }
+  .tilemap { display:grid; grid-template-columns:repeat(12,1fr); grid-auto-rows:1fr; gap:4px; }
+  .tilemap::before { content:""; grid-column:1; grid-row:1; padding-bottom:100%; }
+  .tile { position:relative; border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:.6rem; font-weight:700; color:#fff; cursor:default; aspect-ratio:1; border:1px solid transparent; }
+  .tile.na { background:var(--panel-2)!important; color:var(--faint); border-color:var(--hairline); }
+  .tile:hover { outline:2px solid var(--ink); outline-offset:1px; z-index:2; }
+  .scale { display:flex; align-items:center; gap:10px; margin-top:16px; font-size:.72rem; color:var(--muted); }
+  .scalebar { flex:1; height:10px; border-radius:5px; background:linear-gradient(90deg, var(--bar-lo), var(--bar-hi)); }
+  .statelist { max-height:520px; overflow-y:auto; padding-right:6px; }
+  .srow { display:grid; grid-template-columns:34px 1fr auto; align-items:center; gap:8px; padding:3px 0; font-size:.82rem; }
+  .srow .sn { color:var(--ink-soft); font-weight:600; }
+  .srow .strack { height:14px; background:var(--panel-2); border-radius:4px; overflow:hidden; }
+  .srow .sbar { height:100%; border-radius:4px; background:color-mix(in oklab, var(--bar-hi), var(--bar-lo) calc((1 - var(--t)) * 100%)); width:var(--w); }
+  .srow .sv { font-family:var(--f-num); font-variant-numeric:tabular-nums; color:var(--muted); }
+
+  /* Real-time */
+  .rtbanner { background:var(--good-soft); border:1px solid var(--hairline); border-left:3px solid var(--good); border-radius:12px; padding:16px 18px; margin-bottom:18px; font-size:.95rem; color:var(--ink-soft); }
+  .rtbanner b { color:var(--ink); }
+  .rtgrid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:22px; }
+  .rtcard { background:var(--panel); border:1px solid var(--hairline); border-radius:12px; padding:18px; box-shadow:var(--shadow); }
+  .rtcard .rn { font-weight:700; font-size:1rem; margin-bottom:8px; }
+  .pill { display:inline-flex; align-items:center; gap:6px; font-size:.78rem; font-weight:700; padding:4px 10px; border-radius:999px; }
+  .pill.good { background:var(--good-soft); color:var(--good); }
+  .pill.good::before { content:""; width:8px; height:8px; border-radius:50%; background:var(--good); }
+  .pill.warn { background:rgba(200,140,20,.14); color:#b4740f; } .pill.warn::before{content:"";width:8px;height:8px;border-radius:50%;background:#c8891a;}
+  .pill.high { background:rgba(193,71,90,.14); color:#c1475a; } .pill.high::before{content:"";width:8px;height:8px;border-radius:50%;background:#c1475a;}
+  .rtcard .rnote { margin-top:10px; font-size:.82rem; color:var(--muted); }
+  .livelinks { display:flex; flex-wrap:wrap; gap:10px; margin-top:6px; }
+  .livelink { display:inline-flex; align-items:center; gap:6px; font-size:.85rem; font-weight:600; text-decoration:none; color:var(--accent); background:var(--accent-soft); border:1px solid var(--hairline-strong); border-radius:9px; padding:9px 14px; }
+  .livelink:hover { border-color:var(--accent); }
+
+  .tablewrap { overflow-x:auto; margin-top:14px; display:none; }
+  .tablewrap.on { display:block; }
+  table { border-collapse:collapse; width:100%; font-size:.84rem; }
+  th,td { text-align:left; padding:8px 12px; border-bottom:1px solid var(--hairline); }
+  th { color:var(--muted); font-weight:600; font-size:.72rem; text-transform:uppercase; letter-spacing:.05em; }
+  td.n { font-family:var(--f-num); font-variant-numeric:tabular-nums; text-align:right; }
+
+  .note { background:var(--accent-soft); border:1px solid var(--hairline); border-left:3px solid var(--accent); border-radius:10px; padding:18px 20px; margin-top:22px; }
+  .note h3 { margin:0 0 10px; font-size:.95rem; font-family:var(--f-body); font-weight:700; }
+  .note ul { margin:0; padding-left:18px; }
+  .note li { font-size:.85rem; color:var(--ink-soft); margin-bottom:7px; }
+  .note li:last-child { margin-bottom:0; }
+
+  .sources { margin-top:30px; font-size:.8rem; color:var(--muted); }
+  .sources h3 { font-size:.72rem; text-transform:uppercase; letter-spacing:.1em; color:var(--faint); margin:0 0 8px; }
+  .sources a { text-decoration:none; }
+  .sources a:hover { text-decoration:underline; }
+  .sources li { margin-bottom:4px; }
+  .divider { height:1px; background:var(--hairline); margin:44px 0; border:0; }
+
+  @media (max-width:760px){
+    .stats,.agegrid,.smgrid,.rtgrid { grid-template-columns:1fr; }
+    .statewrap { grid-template-columns:1fr; }
+    .row { --labw:120px; }
+    .row .name { font-size:.78rem; }
+    .tile { font-size:.5rem; }
+  }
+  @media (prefers-reduced-motion:reduce){ *{ transition:none!important; animation:none!important; } }
+</style>
+
+<div class="wrap">
+  <p class="eyebrow">U.S. Population Health · Data Synthesis</p>
+  <h1>The state of America's health</h1>
+  <p class="dek">How common the major health conditions are across the U.S. population — the whole picture, then broken out by age, over time, and state by state. Explore the five views below.</p>
+  <div class="vintage">
+    <span><b>Population base:</b> ~262M U.S. adults (18+)</span>
+    <span><b>Sources:</b> CDC (NHANES · BRFSS · NHIS), SAMHSA, NCI</span>
+    <span><b>Data years:</b> 2019–2024</span>
+  </div>
+
+  <div class="tabs" role="tablist" aria-label="Views">
+    <button class="tab" role="tab" data-view="overall" aria-selected="true">Overall</button>
+    <button class="tab" role="tab" data-view="age" aria-selected="false">By age</button>
+    <button class="tab" role="tab" data-view="trend" aria-selected="false">Over time</button>
+    <button class="tab" role="tab" data-view="state" aria-selected="false">By state</button>
+    <button class="tab" role="tab" data-view="realtime" aria-selected="false">Real-time</button>
+  </div>
+
+  <div class="dl-toolbar" id="dl-toolbar">
+    <span class="dl-lbl">Export this view</span>
+    <button class="dl-btn" id="dl-csv" type="button">⤓ CSV</button>
+    <button class="dl-btn" id="dl-png" type="button">⤓ PNG</button>
+    <span class="dl-status" id="dl-status" role="status" aria-live="polite"></span>
+  </div>
+
+  <!-- OVERALL -->
+  <section class="view on" id="view-overall" role="tabpanel">
+    <div class="stats">
+      <div class="stat"><div class="big">6 in 10</div><div class="lab">adults live with at least one chronic disease</div><div class="sub">CDC</div></div>
+      <div class="stat"><div class="big">4 in 10</div><div class="lab">live with two or more chronic conditions at once</div><div class="sub">CDC</div></div>
+      <div class="stat"><div class="big">~48%</div><div class="lab">have high blood pressure — the most widespread condition</div><div class="sub">CDC · NHANES 2021–23</div></div>
+    </div>
+    <div class="sec-head">
+      <h2>Prevalence among U.S. adults</h2>
+      <button class="toggle" id="tbl-toggle" aria-expanded="false">Show data table</button>
+    </div>
+    <p class="sec-note">Each bar is the share of adults 18+ living with that condition (substance use disorder is age 12+). Because most people have more than one, the bars overlap heavily and do <b>not</b> add to 100%.</p>
+    <div class="chart" id="overall-chart"></div>
+    <p class="axis-cap">Share of U.S. adult population (%)</p>
+    <div class="tablewrap" id="tablewrap"></div>
+
+    <hr class="divider" />
+    <div class="sec-head"><h2>Measured on a different base</h2></div>
+    <p class="sec-note">Important, but counted against a different population — so they aren't on the scale above.</p>
+    <div class="stats">
+      <div class="stat"><div class="big">~18.6M</div><div class="lab">cancer survivors — about 6% of the total U.S. population</div><div class="sub">NCI</div></div>
+      <div class="stat"><div class="big">~14%</div><div class="lab">of adults 65+ live with Alzheimer's or dementia (~7M)</div><div class="sub">Alzheimer's Association / CDC</div></div>
+      <div class="stat"><div class="big">~7%</div><div class="lab">of adults have high-impact chronic pain that limits daily life</div><div class="sub">CDC 2021</div></div>
+    </div>
+  </section>
+
+  <!-- AGE -->
+  <section class="view" id="view-age" role="tabpanel">
+    <div class="sec-head"><h2>How prevalence shifts with age</h2></div>
+    <p class="sec-note">Most conditions climb steeply with age — but not all the same way. Blood pressure and diabetes rise relentlessly; <b>obesity peaks in middle age and eases in the oldest group</b>. Bands differ slightly by survey; each is labeled.</p>
+    <div class="agegrid" id="age-grid"></div>
+    <p class="sec-note" style="margin-top:18px">Sources: high blood pressure &amp; obesity — CDC NHANES (measured), Aug 2021–Aug 2023; diabetes — CDC NHIS 2022 (diagnosed, approximate).</p>
+  </section>
+
+  <!-- TREND -->
+  <section class="view" id="view-trend" role="tabpanel">
+    <div class="sec-head"><h2>The trend over time</h2></div>
+    <p class="sec-note">Self-reported prevalence among U.S. adults, from CDC's BRFSS survey. Diabetes, depression, and asthma have climbed steadily; others are flatter. Hover a point for its year and value. <b>Note:</b> BRFSS is self-reported, so levels run lower than the measured NHANES figures in the Overall view — the useful signal here is direction, not the absolute number.</p>
+    <div class="smgrid" id="trend-grid"></div>
+  </section>
+
+  <!-- STATE -->
+  <section class="view" id="view-state" role="tabpanel">
+    <div class="sec-head"><h2>State by state</h2></div>
+    <p class="sec-note">Pick a condition, then split it by sex. Darker means higher prevalence. Values are CDC BRFSS self-reported estimates (obesity from CDC DNPAO); hover any state for its rate. Use <b>⤓ CSV / PNG</b> above to export exactly what you're viewing.</p>
+    <div class="selector" id="state-selector" role="group" aria-label="Choose a condition"></div>
+    <div class="subsel-row">
+      <span class="subsel-lbl">Breakdown</span>
+      <div class="subsel" id="sex-selector" role="group" aria-label="Choose a sex breakdown">
+        <button class="segbtn" data-sex="all" aria-pressed="true" type="button">Everyone</button>
+        <button class="segbtn" data-sex="Female" aria-pressed="false" type="button">Women</button>
+        <button class="segbtn" data-sex="Male" aria-pressed="false" type="button">Men</button>
+      </div>
+    </div>
+    <div class="statewrap">
+      <div class="mapcard">
+        <div class="mapmeta" id="map-meta"></div>
+        <div class="tilemap" id="tilemap"></div>
+        <div class="scale"><span id="scale-lo"></span><div class="scalebar"></div><span id="scale-hi"></span></div>
+      </div>
+      <div>
+        <div class="statelist" id="state-list"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- REALTIME -->
+  <section class="view" id="view-realtime" role="tabpanel">
+    <div class="sec-head"><h2>Real-time surveillance</h2></div>
+    <p class="sec-note">The chronic-condition data in the other views comes from surveys refreshed every 1–2 years — there is no live feed for it. The one part of U.S. population health that <b>is</b> tracked in near-real-time is infectious respiratory disease, via emergency-department visits and wastewater. Below is the latest CDC snapshot; the figures refresh weekly at the source.</p>
+    <div class="rtbanner" id="rt-banner"></div>
+    <div class="rtgrid" id="rt-grid"></div>
+    <div class="note" style="margin-top:0">
+      <h3>Why this isn't auto-updating</h3>
+      <ul>
+        <li>This page is a self-contained document and can't call live data services, so these values are a <b>snapshot</b>, not a live stream. Re-open the CDC dashboards below for the current week, or ask me to refresh the page.</li>
+        <li>CDC updates respiratory and wastewater data <b>every Friday</b>. Wastewater often gives the earliest signal because it doesn't depend on people seeking care.</li>
+      </ul>
+      <div class="livelinks" style="margin-top:14px">
+        <a class="livelink" href="https://www.cdc.gov/respiratory-viruses/data/index.html" target="_blank" rel="noopener">Respiratory Illnesses Data Channel →</a>
+        <a class="livelink" href="https://www.cdc.gov/wastewater/respiratory-viruses/national.html" target="_blank" rel="noopener">Wastewater Surveillance →</a>
+        <a class="livelink" href="https://www.cdc.gov/nssp/php/data-research/dashboards/index.html" target="_blank" rel="noopener">Syndromic (ED visits) →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- shared caveats + sources -->
+  <div class="note">
+    <h3>How to read this — and what it doesn't say</h3>
+    <ul>
+      <li><b>The figures overlap.</b> One person often lives with several conditions at once, so prevalences can't be summed.</li>
+      <li><b>It's a patchwork of surveys.</b> Overall figures use the most authoritative source per condition (often NHANES, which physically measures people); the age, trend, and state views use BRFSS (self-reported by phone), which runs lower. Compare within a view, not across.</li>
+      <li><b>Many cases are undiagnosed</b> — especially prediabetes, diabetes, kidney disease, and high blood pressure. Self-reported views miss people who don't know they're affected (e.g., BRFSS kidney disease ~4% vs. ~14% when measured).</li>
+      <li><b>Prevalence isn't severity</b>, and estimates carry a margin of error.</li>
+    </ul>
+  </div>
+
+  <div class="sources">
+    <h3>Sources</h3>
+    <ul>
+      <li><a href="https://www.cdc.gov/high-blood-pressure/data-research/facts-stats/index.html" target="_blank" rel="noopener">CDC — High Blood Pressure Facts</a></li>
+      <li><a href="https://www.cdc.gov/nchs/products/databriefs/db508.htm" target="_blank" rel="noopener">CDC NCHS — Obesity Prevalence in Adults (Data Brief 508)</a></li>
+      <li><a href="https://www.cdc.gov/diabetes/php/data-research/index.html" target="_blank" rel="noopener">CDC — National Diabetes Statistics Report</a></li>
+      <li><a href="https://data.cdc.gov/" target="_blank" rel="noopener">CDC BRFSS Prevalence Data &amp; DNPAO (state / trend figures, via data.cdc.gov)</a></li>
+      <li><a href="https://www.naco.org/news/samhsa-releases-new-2024-data-rates-mental-illness-and-substance-use-disorder-us" target="_blank" rel="noopener">SAMHSA — 2024 NSDUH (mental illness &amp; substance use)</a></li>
+      <li><a href="https://www.cdc.gov/respiratory-viruses/data/index.html" target="_blank" rel="noopener">CDC — Respiratory Illnesses Data Channel (real-time)</a></li>
+    </ul>
+  </div>
+</div>
+
+<div id="tip" role="status" aria-live="polite"></div>
+
+<script>
+const DATA = {"meta":{"asof":"July 2026","pop":"~262 million U.S. adults (18+)","built":"2026-07-27 22:06 UTC"},"overall":[{"name":"High blood pressure","cat":"Cardiometabolic","pct":48,"count":"119.9M","src":"CDC \u00b7 NHANES 2021\u201323","base":"adults 18+ (measured)"},{"name":"Prediabetes","cat":"Cardiometabolic","pct":43,"count":"115.2M","src":"CDC","base":"adults 18+ \u00b7 ~8 in 10 undiagnosed"},{"name":"Obesity","cat":"Cardiometabolic","pct":40,"count":"~106M","src":"CDC \u00b7 NHANES 2021\u201323","base":"adults 18+ (measured) \u00b7 severe ~10%"},{"name":"Arthritis","cat":"Musculoskeletal","pct":25,"count":"~66M","src":"CDC \u00b7 BRFSS 2023","base":"adults 18+ (diagnosed)"},{"name":"Any mental illness","cat":"Mental & behavioral","pct":23,"count":"61.5M","src":"SAMHSA \u00b7 NSDUH 2024","base":"adults 18+ \u00b7 past year"},{"name":"High cholesterol","cat":"Cardiometabolic","pct":22,"count":"\u2014","src":"CDC \u00b7 NHIS","base":"adults 18+ (ever told)"},{"name":"Chronic pain","cat":"Musculoskeletal","pct":21,"count":"51.6M","src":"CDC \u00b7 2021","base":"adults 18+"},{"name":"Depression","cat":"Mental & behavioral","pct":20,"count":"~53M","src":"CDC \u00b7 BRFSS 2023","base":"adults 18+ (ever diagnosed)"},{"name":"Anxiety disorder","cat":"Mental & behavioral","pct":19,"count":"~50M","src":"CDC \u00b7 2024","base":"adults 18+ (ever diagnosed)"},{"name":"Substance use disorder","cat":"Mental & behavioral","pct":17,"count":"48.4M","src":"SAMHSA \u00b7 NSDUH 2024","base":"age 12+ \u00b7 past year"},{"name":"Chronic kidney disease","cat":"Other / systemic","pct":14,"count":"~35.5M","src":"CDC","base":"adults 18+ \u00b7 ~9 in 10 undiagnosed"},{"name":"Diabetes","cat":"Cardiometabolic","pct":12,"count":"40.1M","src":"CDC","base":"adults 18+ (diagnosed + undiagnosed)"},{"name":"Asthma (current)","cat":"Respiratory","pct":10,"count":"~26M","src":"CDC \u00b7 BRFSS 2023","base":"adults 18+"},{"name":"Heart disease","cat":"Cardiometabolic","pct":7,"count":"~17M","src":"CDC \u00b7 BRFSS 2023","base":"adults 18+"},{"name":"COPD","cat":"Respiratory","pct":6,"count":"~16M","src":"CDC \u00b7 BRFSS 2023","base":"adults 18+"}],"age":{"bands":["Younger","Middle age","Older"],"conditions":[{"name":"High blood pressure","src":"NHANES 2021\u201323","pts":[["18\u201339",23.4],["40\u201359",52.5],["60+",71.6]]},{"name":"Obesity","src":"NHANES 2021\u201323","pts":[["20\u201339",35.5],["40\u201359",46.4],["60+",38.9]]},{"name":"Diabetes (diagnosed)","src":"NHIS 2022 \u00b7 approx.","pts":[["18\u201344",4],["45\u201364",12],["65+",20]]}]},"trend":{"DIABETES":{"label":"Diabetes","series":{"2019":10.8,"2020":10.8,"2021":11.1,"2022":11.6,"2023":11.8,"2024":12.3}},"DEPR":{"label":"Depression","series":{"2019":19.7,"2020":19.2,"2021":20.4,"2022":21.6,"2023":21.8,"2024":21.7}},"ASTHMA":{"label":"Current asthma","series":{"2011":9.1,"2012":8.9,"2013":9.0,"2014":8.9,"2015":9.2,"2016":9.1,"2017":9.4,"2018":9.5,"2019":9.7,"2020":9.6,"2021":9.8,"2022":10.4,"2023":10.2,"2024":10.8}},"COPD":{"label":"COPD","series":{"2021":6.1,"2022":6.7,"2023":6.3,"2024":6.3}},"ARTH":{"label":"Arthritis","series":{"2019":25.8,"2020":24.4,"2022":27.1,"2023":26.3,"2024":26.9}},"HIBP":{"label":"High blood pressure","series":{"2021":32.2,"2023":34.0}},"HICHOL":{"label":"High cholesterol","series":{"2021":35.6,"2023":37.2}},"CKD":{"label":"Chronic kidney disease","series":{"2019":2.9,"2020":2.9,"2021":2.9,"2022":3.5,"2023":3.7,"2024":3.9}},"CANCER":{"label":"Cancer (non-skin)","series":{"2022":8.3,"2023":8.3,"2024":8.6}}},"state":{"OBESITY":{"label":"Obesity","us":33.1,"year":"2024","values":{"AL":38.9,"AK":34.0,"AZ":33.3,"AR":38.9,"CA":29.1,"CO":25.0,"CT":32.0,"DE":36.6,"DC":25.5,"FL":29.6,"GA":35.4,"HI":27.0,"ID":32.7,"IL":34.2,"IN":38.4,"IA":36.6,"KS":37.6,"KY":37.2,"LA":39.2,"ME":33.2,"MD":32.7,"MA":27.0,"MI":36.1,"MN":32.3,"MS":40.4,"MO":34.6,"MT":31.0,"NE":37.6,"NV":34.2,"NH":31.1,"NJ":27.7,"NM":34.5,"NY":29.5,"NC":34.5,"ND":36.8,"OH":36.9,"OK":36.8,"OR":33.5,"PA":34.2,"RI":31.1,"SC":34.6,"SD":37.0,"TX":35.6,"UT":31.0,"VT":29.0,"VA":32.3,"WA":31.5,"WV":41.4,"WI":37.4,"WY":32.5}},"HIBP":{"label":"High blood pressure","us":34.0,"year":"2023","values":{"AK":33.8,"AL":44.7,"AR":42.5,"AZ":33.4,"CA":30.6,"CO":27.3,"CT":32.0,"DC":29.1,"DE":37.8,"FL":35.9,"GA":35.7,"HI":32.4,"IA":34.5,"ID":31.2,"IL":33.5,"IN":37.6,"KS":34.7,"LA":43.4,"MA":31.0,"MD":35.8,"ME":35.8,"MI":37.0,"MN":31.1,"MO":36.2,"MS":46.0,"MT":32.2,"NC":37.5,"ND":31.8,"NE":32.7,"NH":33.3,"NJ":33.4,"NM":34.2,"NV":34.0,"NY":32.1,"OH":37.2,"OK":38.4,"OR":33.5,"RI":34.0,"SC":38.8,"SD":35.2,"TN":40.7,"TX":32.3,"UT":27.3,"VA":35.6,"VT":32.4,"WA":30.6,"WI":33.1,"WV":45.1,"WY":31.5}},"HICHOL":{"label":"High cholesterol","us":37.2,"year":"2023","values":{"AK":34.2,"AL":42.3,"AR":40.2,"AZ":38.7,"CA":37.0,"CO":32.5,"CT":38.6,"DC":32.8,"DE":43.6,"FL":39.3,"GA":36.9,"HI":37.5,"IA":36.6,"ID":34.4,"IL":36.3,"IN":39.4,"KS":38.5,"LA":39.5,"MA":35.7,"MD":39.3,"ME":38.3,"MI":35.6,"MN":33.8,"MO":38.5,"MS":39.8,"MT":34.0,"NC":36.3,"ND":35.1,"NE":34.0,"NH":35.8,"NJ":39.1,"NM":35.4,"NV":39.3,"NY":38.5,"OH":37.4,"OK":39.2,"OR":34.2,"RI":35.0,"SC":39.3,"SD":35.5,"TN":40.6,"TX":36.3,"UT":31.2,"VA":39.3,"VT":33.1,"WA":36.2,"WI":35.3,"WV":45.0,"WY":33.8}},"ARTH":{"label":"Arthritis","us":26.9,"year":"2024","values":{"AL":34.6,"AK":26.4,"AZ":26.2,"AR":31.4,"CA":21.3,"CO":24.8,"CT":25.2,"DE":30.8,"DC":17.6,"FL":27.5,"GA":25.8,"HI":24.4,"ID":26.1,"IL":25.9,"IN":29.9,"IA":26.6,"KS":27.2,"KY":34.3,"LA":31.6,"ME":34.3,"MD":26.2,"MA":25.3,"MI":31.5,"MN":25.2,"MS":32.4,"MO":30.7,"MT":30.2,"NE":26.1,"NV":26.9,"NH":28.2,"NJ":24.1,"NM":28.1,"NY":24.6,"NC":28.0,"ND":26.4,"OH":32.5,"OK":30.8,"OR":29.4,"PA":29.8,"RI":26.4,"SC":30.6,"SD":26.4,"TX":21.2,"UT":21.7,"VT":30.0,"VA":28.3,"WA":25.9,"WV":41.2,"WI":28.9,"WY":28.5}},"DEPR":{"label":"Depression","us":21.7,"year":"2024","values":{"AL":24.8,"AK":21.9,"AZ":19.2,"AR":25.1,"CA":17.8,"CO":23.0,"CT":18.4,"DE":21.4,"DC":22.4,"FL":17.9,"GA":18.4,"HI":14.4,"ID":21.4,"IL":20.8,"IN":24.5,"IA":19.8,"KS":21.3,"KY":28.3,"LA":26.6,"ME":26.7,"MD":18.9,"MA":21.1,"MI":26.7,"MN":24.2,"MS":19.7,"MO":23.0,"MT":24.7,"NE":18.8,"NV":20.6,"NH":22.9,"NJ":13.3,"NM":19.2,"NY":15.9,"NC":22.5,"ND":21.6,"OH":26.6,"OK":26.1,"OR":27.3,"PA":22.0,"RI":24.9,"SC":20.7,"SD":18.2,"TX":21.7,"UT":23.8,"VT":26.4,"VA":21.7,"WA":24.6,"WV":30.2,"WI":24.1,"WY":24.0}},"DIABETES":{"label":"Diabetes","us":12.3,"year":"2024","values":{"AL":15.1,"AK":9.4,"AZ":11.5,"AR":15.3,"CA":12.6,"CO":8.4,"CT":11.7,"DE":13.2,"DC":8.4,"FL":11.9,"GA":12.8,"HI":11.5,"ID":9.3,"IL":12.8,"IN":14.2,"IA":11.4,"KS":12.5,"KY":16.2,"LA":15.4,"ME":11.5,"MD":12.4,"MA":9.6,"MI":13.6,"MN":10.1,"MS":15.2,"MO":11.2,"MT":8.7,"NE":10.5,"NV":13.6,"NH":10.1,"NJ":10.8,"NM":12.3,"NY":12.3,"NC":13.2,"ND":10.6,"OH":13.1,"OK":13.2,"OR":12.0,"PA":13.3,"RI":11.6,"SC":13.9,"SD":11.8,"TX":13.5,"UT":8.7,"VT":8.9,"VA":12.9,"WA":10.0,"WV":18.4,"WI":11.9,"WY":10.1}},"ASTHMA":{"label":"Current asthma","us":10.8,"year":"2024","values":{"AL":10.9,"AK":10.8,"AZ":11.1,"AR":11.1,"CA":8.1,"CO":11.7,"CT":11.7,"DE":10.9,"DC":11.4,"FL":9.1,"GA":10.0,"HI":9.5,"ID":9.8,"IL":10.2,"IN":11.0,"IA":9.4,"KS":11.4,"KY":12.7,"LA":10.1,"ME":13.9,"MD":10.2,"MA":11.6,"MI":12.7,"MN":9.3,"MS":9.1,"MO":10.3,"MT":12.3,"NE":9.5,"NV":8.6,"NH":12.8,"NJ":10.0,"NM":10.4,"NY":10.7,"NC":9.3,"ND":9.7,"OH":11.6,"OK":12.5,"OR":14.2,"PA":12.0,"RI":12.2,"SC":9.7,"SD":9.0,"TX":8.6,"UT":11.5,"VT":12.2,"VA":10.8,"WA":10.9,"WV":14.1,"WI":11.3,"WY":10.3}},"CANCER":{"label":"Cancer (non-skin)","us":8.6,"year":"2024","values":{"AL":8.7,"AK":7.4,"AZ":9.2,"AR":8.7,"CA":7.1,"CO":8.6,"CT":8.3,"DE":10.4,"DC":5.7,"FL":10.5,"GA":7.8,"HI":6.9,"ID":8.6,"IL":7.9,"IN":8.9,"IA":8.8,"KS":8.5,"KY":9.4,"LA":8.4,"ME":11.1,"MD":7.8,"MA":9.0,"MI":9.4,"MN":9.1,"MS":7.6,"MO":8.4,"MT":10.1,"NE":8.2,"NV":7.5,"NH":9.6,"NJ":7.9,"NM":7.5,"NY":7.6,"NC":7.4,"ND":8.6,"OH":9.8,"OK":8.5,"OR":11.1,"PA":8.8,"RI":9.1,"SC":9.2,"SD":9.6,"TX":7.1,"UT":8.1,"VT":9.6,"VA":9.3,"WA":8.6,"WV":9.5,"WI":8.8,"WY":9.6}},"COPD":{"label":"COPD","us":6.3,"year":"2024","values":{"AL":8.8,"AK":6.1,"AZ":5.4,"AR":9.6,"CA":4.0,"CO":5.4,"CT":5.7,"DE":5.9,"DC":4.4,"FL":7.1,"GA":6.7,"HI":4.6,"ID":5.0,"IL":6.0,"IN":8.8,"IA":5.9,"KS":6.8,"KY":10.9,"LA":8.0,"ME":9.1,"MD":5.5,"MA":4.8,"MI":8.8,"MN":4.2,"MS":8.1,"MO":8.1,"MT":6.6,"NE":5.9,"NV":6.5,"NH":6.8,"NJ":5.2,"NM":6.5,"NY":5.4,"NC":6.7,"ND":5.5,"OH":8.1,"OK":8.5,"OR":6.8,"PA":6.8,"RI":6.3,"SC":7.8,"SD":5.1,"TX":5.8,"UT":4.0,"VT":5.8,"VA":6.6,"WA":4.7,"WV":12.6,"WI":6.8,"WY":6.9}},"CKD":{"label":"Chronic kidney disease","us":3.9,"year":"2024","values":{"AL":4.1,"AK":3.2,"AZ":4.2,"AR":4.0,"CA":3.9,"CO":3.5,"CT":3.4,"DE":4.5,"DC":2.6,"FL":4.5,"GA":4.8,"HI":4.9,"ID":3.4,"IL":4.3,"IN":5.0,"IA":3.8,"KS":3.6,"KY":5.5,"LA":4.9,"ME":4.5,"MD":3.9,"MA":3.8,"MI":4.5,"MN":3.7,"MS":3.8,"MO":4.1,"MT":3.1,"NE":3.8,"NV":4.1,"NH":3.3,"NJ":3.2,"NM":3.4,"NY":3.7,"NC":3.5,"ND":3.4,"OH":4.7,"OK":4.4,"OR":4.4,"PA":4.7,"RI":3.0,"SC":5.1,"SD":4.0,"TX":4.1,"UT":3.3,"VT":2.8,"VA":4.3,"WA":3.7,"WV":5.8,"WI":4.0,"WY":3.5}}},"tilegrid":{"AK":[0,0],"ME":[0,11],"VT":[1,10],"NH":[1,11],"WA":[2,1],"ID":[2,2],"MT":[2,3],"ND":[2,4],"MN":[2,5],"WI":[2,6],"MI":[2,7],"NY":[2,9],"MA":[2,10],"OR":[3,1],"NV":[3,2],"WY":[3,3],"SD":[3,4],"IA":[3,5],"IL":[3,6],"IN":[3,7],"OH":[3,8],"PA":[3,9],"NJ":[3,10],"CT":[3,11],"CA":[4,1],"UT":[4,2],"CO":[4,3],"NE":[4,4],"MO":[4,5],"KY":[4,6],"WV":[4,7],"VA":[4,8],"MD":[4,9],"DE":[4,10],"RI":[4,11],"AZ":[5,2],"NM":[5,3],"KS":[5,4],"AR":[5,5],"TN":[5,6],"NC":[5,7],"SC":[5,8],"DC":[5,9],"OK":[6,4],"LA":[6,5],"MS":[6,6],"AL":[6,7],"GA":[6,8],"HI":[7,0],"TX":[7,4],"FL":[7,9]},"realtime":{"cadence":"Updated weekly (Fridays) \u00b7 auto-refreshed","items":[{"name":"COVID-19","level":"0.2% of ED visits","tone":"good","note":"\u25b2 rising vs 4 weeks ago (0.1%). Week ending 2026-07-18."},{"name":"Influenza","level":"0.1% of ED visits","tone":"good","note":"\u2192 flat vs 4 weeks ago (0.1%). Week ending 2026-07-18."},{"name":"RSV","level":"0.0% of ED visits","tone":"good","note":"\u2192 flat vs 4 weeks ago (0.0%). Week ending 2026-07-18."}],"overall":"Acute respiratory illness activity is Very Low nationally \u2014 50 of 51 states at Minimal/Low/Very Low this week.","asof":"July 18, 2026"}};
+const STNAME = {AL:"Alabama",AK:"Alaska",AZ:"Arizona",AR:"Arkansas",CA:"California",CO:"Colorado",CT:"Connecticut",DE:"Delaware",DC:"District of Columbia",FL:"Florida",GA:"Georgia",HI:"Hawaii",ID:"Idaho",IL:"Illinois",IN:"Indiana",IA:"Iowa",KS:"Kansas",KY:"Kentucky",LA:"Louisiana",ME:"Maine",MD:"Maryland",MA:"Massachusetts",MI:"Michigan",MN:"Minnesota",MS:"Mississippi",MO:"Missouri",MT:"Montana",NE:"Nebraska",NV:"Nevada",NH:"New Hampshire",NJ:"New Jersey",NM:"New Mexico",NY:"New York",NC:"North Carolina",ND:"North Dakota",OH:"Ohio",OK:"Oklahoma",OR:"Oregon",PA:"Pennsylvania",RI:"Rhode Island",SC:"South Carolina",SD:"South Dakota",TN:"Tennessee",TX:"Texas",UT:"Utah",VT:"Vermont",VA:"Virginia",WA:"Washington",WV:"West Virginia",WI:"Wisconsin",WY:"Wyoming"};
+
+const STATE_SEX = {"OBESITY":{"Male":{"AL":36.5,"AK":33.7,"AZ":33.3,"AR":38.7,"CA":29.0,"CO":23.9,"CT":30.9,"DE":34.7,"DC":20.9,"FL":30.0,"GA":32.8,"HI":28.9,"ID":34.7,"IL":32.1,"IN":36.4,"IA":35.9,"KS":36.6,"KY":34.9,"LA":38.0,"ME":33.2,"MD":30.6,"MA":27.6,"MI":33.9,"MN":31.4,"MS":38.0,"MO":35.1,"MT":31.5,"NE":37.8,"NV":33.7,"NH":31.7,"NJ":27.0,"NM":33.1,"NY":29.1,"NC":32.4,"ND":37.8,"OH":35.1,"OK":35.3,"OR":32.8,"PA":33.3,"RI":29.3,"SC":32.5,"SD":36.8,"TX":34.6,"UT":31.4,"VT":27.7,"VA":31.4,"WA":31.6,"WV":40.3,"WI":36.9,"WY":31.8},"Female":{"AL":41.3,"AK":34.4,"AZ":33.3,"AR":39.1,"CA":29.2,"CO":26.1,"CT":33.2,"DE":38.5,"DC":29.6,"FL":29.3,"GA":37.9,"HI":24.9,"ID":30.5,"IL":36.3,"IN":40.6,"IA":37.4,"KS":38.6,"KY":39.5,"LA":40.5,"ME":33.3,"MD":34.7,"MA":26.4,"MI":38.5,"MN":33.3,"MS":42.7,"MO":34.1,"MT":30.3,"NE":37.4,"NV":34.8,"NH":30.3,"NJ":28.3,"NM":36.0,"NY":30.0,"NC":36.6,"ND":35.7,"OH":38.7,"OK":38.3,"OR":34.3,"PA":35.1,"RI":33.0,"SC":36.7,"SD":37.2,"TX":36.6,"UT":30.6,"VT":30.4,"VA":33.3,"WA":31.3,"WV":42.5,"WI":38.0,"WY":33.3}},"HIBP":{"Male":{"AK":38.8,"AL":47.4,"AR":44.6,"AZ":36.2,"CA":34.0,"CO":31.5,"CT":35.4,"DC":32.6,"DE":40.6,"FL":39.1,"GA":35.1,"HI":35.6,"IA":36.6,"ID":35.1,"IL":34.0,"IN":40.0,"KS":37.2,"LA":44.7,"MA":35.2,"MD":38.4,"ME":39.1,"MI":40.2,"MN":34.6,"MO":39.2,"MS":48.1,"MT":36.4,"NC":40.1,"ND":35.6,"NE":35.8,"NH":37.8,"NJ":35.6,"NM":37.2,"NV":38.4,"NY":33.7,"OH":39.3,"OK":41.0,"OR":37.5,"RI":37.5,"SC":40.6,"SD":41.0,"TN":43.9,"TX":34.0,"UT":31.8,"VA":37.6,"VT":36.4,"WA":34.5,"WI":36.3,"WV":48.1,"WY":34.6},"Female":{"AK":28.4,"AL":42.3,"AR":40.4,"AZ":30.8,"CA":27.5,"CO":23.2,"CT":28.8,"DC":26.1,"DE":35.4,"FL":32.9,"GA":36.2,"HI":29.2,"IA":32.6,"ID":27.4,"IL":33.0,"IN":35.4,"KS":32.2,"LA":42.1,"MA":27.1,"MD":33.4,"ME":32.7,"MI":33.8,"MN":27.7,"MO":33.4,"MS":44.1,"MT":28.0,"NC":35.2,"ND":27.8,"NE":29.7,"NH":29.1,"NJ":31.4,"NM":31.2,"NV":29.7,"NY":30.6,"OH":35.1,"OK":36.0,"OR":29.7,"RI":30.7,"SC":37.3,"SD":29.4,"TN":37.8,"TX":30.6,"UT":22.8,"VA":33.7,"VT":28.7,"WA":26.8,"WI":30.0,"WV":42.2,"WY":28.4}},"HICHOL":{"Male":{"AK":36.7,"AL":44.2,"AR":39.7,"AZ":38.8,"CA":38.3,"CO":34.8,"CT":40.1,"DC":34.9,"DE":42.7,"FL":38.4,"GA":37.8,"HI":38.5,"IA":38.1,"ID":35.9,"IL":37.3,"IN":40.1,"KS":38.4,"LA":37.7,"MA":39.9,"MD":39.9,"ME":39.8,"MI":36.1,"MN":34.7,"MO":39.5,"MS":39.4,"MT":35.6,"NC":37.7,"ND":34.0,"NE":35.6,"NH":39.3,"NJ":40.0,"NM":35.0,"NV":42.2,"NY":38.9,"OH":38.2,"OK":41.4,"OR":37.4,"RI":34.6,"SC":39.8,"SD":38.0,"TN":42.2,"TX":37.8,"UT":32.8,"VA":41.3,"VT":36.2,"WA":38.4,"WI":36.4,"WV":44.6,"WY":35.6},"Female":{"AK":31.7,"AL":40.7,"AR":40.6,"AZ":38.6,"CA":35.8,"CO":30.3,"CT":37.4,"DC":31.1,"DE":44.5,"FL":40.1,"GA":36.1,"HI":36.6,"IA":35.3,"ID":33.1,"IL":35.5,"IN":38.7,"KS":38.6,"LA":41.0,"MA":31.9,"MD":38.9,"ME":36.9,"MI":35.1,"MN":33.0,"MO":37.6,"MS":40.1,"MT":32.5,"NC":35.1,"ND":36.3,"NE":32.6,"NH":32.5,"NJ":38.4,"NM":35.8,"NV":36.7,"NY":38.2,"OH":36.6,"OK":37.2,"OR":31.2,"RI":35.3,"SC":38.9,"SD":33.1,"TN":39.2,"TX":35.0,"UT":29.6,"VA":37.5,"VT":30.1,"WA":34.1,"WI":34.3,"WV":45.3,"WY":32.0}},"ARTH":{"Male":{"AL":28.9,"AK":23.0,"AZ":23.1,"AR":26.3,"CA":17.6,"CO":21.9,"CT":21.3,"DE":26.6,"DC":14.7,"FL":23.7,"GA":21.6,"HI":23.4,"ID":23.3,"IL":21.0,"IN":26.1,"IA":22.5,"KS":22.6,"KY":29.4,"LA":27.6,"ME":30.2,"MD":22.6,"MA":22.0,"MI":27.3,"MN":21.3,"MS":29.5,"MO":27.2,"MT":27.4,"NE":22.4,"NV":23.8,"NH":25.1,"NJ":19.3,"NM":24.3,"NY":20.8,"NC":24.5,"ND":22.2,"OH":28.2,"OK":26.4,"OR":23.9,"PA":25.5,"RI":22.5,"SC":24.9,"SD":22.7,"TX":17.6,"UT":18.2,"VT":27.5,"VA":25.2,"WA":21.7,"WV":36.2,"WI":25.4,"WY":25.7},"Female":{"AL":39.9,"AK":30.2,"AZ":29.2,"AR":36.3,"CA":24.9,"CO":27.8,"CT":29.0,"DE":34.7,"DC":20.1,"FL":31.1,"GA":29.8,"HI":25.4,"ID":28.9,"IL":30.5,"IN":33.6,"IA":30.6,"KS":31.6,"KY":39.0,"LA":35.5,"ME":38.2,"MD":29.5,"MA":28.4,"MI":35.5,"MN":29.0,"MS":35.0,"MO":34.0,"MT":33.1,"NE":29.7,"NV":29.9,"NH":31.3,"NJ":28.7,"NM":31.9,"NY":28.2,"NC":31.2,"ND":30.8,"OH":36.7,"OK":35.1,"OR":34.8,"PA":34.1,"RI":30.1,"SC":35.8,"SD":30.3,"TX":24.8,"UT":25.2,"VT":32.5,"VA":31.3,"WA":30.0,"WV":46.1,"WI":32.4,"WY":31.4}},"DEPR":{"Male":{"AL":17.4,"AK":15.7,"AZ":14.5,"AR":18.1,"CA":13.7,"CO":16.8,"CT":13.4,"DE":14.4,"DC":17.8,"FL":13.8,"GA":13.5,"HI":12.4,"ID":15.7,"IL":15.0,"IN":17.0,"IA":13.2,"KS":14.6,"KY":20.8,"LA":18.8,"ME":19.1,"MD":13.8,"MA":14.9,"MI":19.3,"MN":16.9,"MS":13.7,"MO":16.5,"MT":17.5,"NE":13.0,"NV":16.4,"NH":17.6,"NJ":9.6,"NM":14.2,"NY":12.4,"NC":16.1,"ND":13.6,"OH":19.7,"OK":18.7,"OR":19.5,"PA":15.4,"RI":19.8,"SC":15.0,"SD":13.0,"TX":15.9,"UT":16.2,"VT":20.0,"VA":15.4,"WA":18.0,"WV":22.8,"WI":16.6,"WY":16.1},"Female":{"AL":31.6,"AK":28.9,"AZ":23.8,"AR":31.8,"CA":21.9,"CO":29.4,"CT":23.1,"DE":27.8,"DC":26.4,"FL":21.8,"GA":23.0,"HI":16.5,"ID":27.0,"IL":26.5,"IN":31.8,"IA":26.4,"KS":28.0,"KY":35.5,"LA":33.9,"ME":33.8,"MD":23.7,"MA":26.8,"MI":34.0,"MN":31.6,"MS":25.2,"MO":29.1,"MT":32.0,"NE":24.7,"NV":24.8,"NH":28.1,"NJ":16.8,"NM":24.1,"NY":19.2,"NC":28.4,"ND":30.1,"OH":33.2,"OK":33.4,"OR":34.8,"PA":28.4,"RI":29.8,"SC":25.9,"SD":23.6,"TX":27.5,"UT":31.5,"VT":32.7,"VA":27.7,"WA":31.2,"WV":37.5,"WI":31.6,"WY":32.2}},"DIABETES":{"Male":{"AL":14.0,"AK":9.7,"AZ":12.3,"AR":16.4,"CA":13.5,"CO":9.0,"CT":12.7,"DE":14.5,"DC":8.6,"FL":12.6,"GA":13.0,"HI":12.6,"ID":10.4,"IL":13.3,"IN":15.2,"IA":12.0,"KS":12.2,"KY":16.4,"LA":15.4,"ME":12.1,"MD":12.7,"MA":10.7,"MI":14.2,"MN":10.4,"MS":16.0,"MO":11.9,"MT":9.0,"NE":11.1,"NV":15.3,"NH":11.8,"NJ":11.5,"NM":12.1,"NY":13.2,"NC":13.0,"ND":11.8,"OH":13.6,"OK":13.4,"OR":12.2,"PA":14.3,"RI":12.7,"SC":14.0,"SD":13.0,"TX":13.6,"UT":9.4,"VT":10.2,"VA":12.6,"WA":10.8,"WV":17.7,"WI":13.2,"WY":10.5},"Female":{"AL":16.0,"AK":9.1,"AZ":10.8,"AR":14.3,"CA":11.7,"CO":7.8,"CT":10.7,"DE":12.1,"DC":8.2,"FL":11.3,"GA":12.7,"HI":10.5,"ID":8.2,"IL":12.3,"IN":13.3,"IA":10.8,"KS":12.8,"KY":16.0,"LA":15.4,"ME":10.8,"MD":12.2,"MA":8.5,"MI":13.1,"MN":9.7,"MS":14.5,"MO":10.6,"MT":8.4,"NE":10.0,"NV":11.9,"NH":8.5,"NJ":10.1,"NM":12.4,"NY":11.5,"NC":13.3,"ND":9.4,"OH":12.7,"OK":13.1,"OR":11.9,"PA":12.3,"RI":10.5,"SC":13.8,"SD":10.7,"TX":13.5,"UT":7.9,"VT":7.7,"VA":13.2,"WA":9.1,"WV":19.0,"WI":10.7,"WY":9.7}},"ASTHMA":{"Male":{"AL":7.6,"AK":7.1,"AZ":7.9,"AR":7.7,"CA":6.1,"CO":8.6,"CT":7.2,"DE":8.5,"DC":8.9,"FL":6.2,"GA":7.4,"HI":7.5,"ID":7.1,"IL":7.3,"IN":7.9,"IA":7.1,"KS":8.2,"KY":9.5,"LA":6.8,"ME":9.5,"MD":7.4,"MA":8.3,"MI":8.3,"MN":6.6,"MS":7.3,"MO":7.1,"MT":9.1,"NE":7.9,"NV":7.1,"NH":9.2,"NJ":7.3,"NM":7.0,"NY":8.5,"NC":5.9,"ND":6.9,"OH":8.3,"OK":9.8,"OR":9.7,"PA":8.2,"RI":9.0,"SC":6.8,"SD":6.6,"TX":5.9,"UT":8.3,"VT":8.6,"VA":8.4,"WA":8.0,"WV":10.5,"WI":7.9,"WY":7.2},"Female":{"AL":13.8,"AK":14.8,"AZ":14.2,"AR":14.3,"CA":10.1,"CO":14.9,"CT":16.0,"DE":13.2,"DC":13.4,"FL":11.8,"GA":12.3,"HI":11.5,"ID":12.6,"IL":13.1,"IN":14.0,"IA":11.7,"KS":14.6,"KY":15.7,"LA":13.2,"ME":18.1,"MD":12.7,"MA":14.6,"MI":17.0,"MN":11.9,"MS":10.7,"MO":13.4,"MT":15.7,"NE":11.2,"NV":10.1,"NH":16.3,"NJ":12.5,"NM":13.7,"NY":12.7,"NC":12.5,"ND":12.6,"OH":14.8,"OK":15.1,"OR":18.5,"PA":15.8,"RI":15.2,"SC":12.4,"SD":11.5,"TX":11.2,"UT":14.8,"VT":15.7,"VA":13.1,"WA":13.9,"WV":17.7,"WI":14.8,"WY":13.6}},"CANCER":{"Male":{"AL":9.3,"AK":5.9,"AZ":8.0,"AR":8.5,"CA":6.2,"CO":7.9,"CT":6.5,"DE":10.4,"DC":5.6,"FL":10.2,"GA":7.6,"HI":6.0,"ID":8.7,"IL":6.6,"IN":7.8,"IA":8.0,"KS":8.0,"KY":8.2,"LA":7.6,"ME":10.0,"MD":6.7,"MA":8.2,"MI":8.5,"MN":8.1,"MS":7.1,"MO":7.5,"MT":8.9,"NE":7.5,"NV":7.6,"NH":9.0,"NJ":7.0,"NM":7.1,"NY":6.8,"NC":7.4,"ND":8.1,"OH":9.1,"OK":7.8,"OR":10.0,"PA":7.8,"RI":8.1,"SC":9.0,"SD":8.8,"TX":6.5,"UT":7.2,"VT":8.7,"VA":7.9,"WA":7.1,"WV":8.1,"WI":8.1,"WY":8.7},"Female":{"AL":8.2,"AK":9.1,"AZ":10.3,"AR":8.9,"CA":7.9,"CO":9.4,"CT":10.0,"DE":10.4,"DC":5.8,"FL":10.8,"GA":7.9,"HI":7.7,"ID":8.4,"IL":9.1,"IN":10.0,"IA":9.6,"KS":9.0,"KY":10.5,"LA":9.3,"ME":12.1,"MD":8.8,"MA":9.7,"MI":10.3,"MN":10.2,"MS":8.0,"MO":9.2,"MT":11.4,"NE":9.0,"NV":7.4,"NH":10.3,"NJ":8.7,"NM":7.9,"NY":8.3,"NC":7.5,"ND":9.0,"OH":10.5,"OK":9.2,"OR":12.2,"PA":9.8,"RI":10.1,"SC":9.5,"SD":10.4,"TX":7.6,"UT":8.9,"VT":10.5,"VA":10.6,"WA":10.0,"WV":10.9,"WI":9.6,"WY":10.5}},"COPD":{"Male":{"AL":7.6,"AK":5.4,"AZ":4.5,"AR":8.5,"CA":3.9,"CO":5.1,"CT":4.4,"DE":4.8,"DC":4.0,"FL":6.1,"GA":6.0,"HI":4.3,"ID":4.7,"IL":5.1,"IN":7.6,"IA":5.8,"KS":6.1,"KY":9.7,"LA":5.9,"ME":8.8,"MD":5.0,"MA":4.6,"MI":7.2,"MN":3.8,"MS":6.6,"MO":6.6,"MT":6.0,"NE":5.6,"NV":5.5,"NH":6.1,"NJ":3.8,"NM":6.4,"NY":5.0,"NC":6.0,"ND":4.2,"OH":7.2,"OK":7.2,"OR":6.3,"PA":5.7,"RI":5.2,"SC":6.7,"SD":3.7,"TX":4.8,"UT":3.9,"VT":5.7,"VA":5.9,"WA":4.2,"WV":10.5,"WI":6.0,"WY":5.9},"Female":{"AL":10.0,"AK":7.0,"AZ":6.2,"AR":10.7,"CA":4.0,"CO":5.7,"CT":7.0,"DE":7.0,"DC":4.7,"FL":8.1,"GA":7.3,"HI":4.9,"ID":5.2,"IL":6.9,"IN":10.1,"IA":6.0,"KS":7.5,"KY":12.2,"LA":10.0,"ME":9.5,"MD":6.0,"MA":5.1,"MI":10.5,"MN":4.7,"MS":9.4,"MO":9.5,"MT":7.1,"NE":6.1,"NV":7.5,"NH":7.4,"NJ":6.5,"NM":6.5,"NY":5.8,"NC":7.3,"ND":6.8,"OH":9.1,"OK":9.8,"OR":7.4,"PA":7.8,"RI":7.2,"SC":8.8,"SD":6.7,"TX":6.8,"UT":4.1,"VT":5.9,"VA":7.4,"WA":5.2,"WV":14.6,"WI":7.5,"WY":8.0}},"CKD":{"Male":{"AL":3.6,"AK":2.5,"AZ":3.8,"AR":3.2,"CA":3.6,"CO":3.1,"CT":3.3,"DE":4.9,"DC":2.5,"FL":4.2,"GA":4.5,"HI":5.2,"ID":3.2,"IL":4.4,"IN":4.1,"IA":3.3,"KS":2.8,"KY":4.7,"LA":4.3,"ME":3.8,"MD":4.2,"MA":3.8,"MI":4.6,"MN":3.3,"MS":3.4,"MO":3.4,"MT":2.7,"NE":3.7,"NV":3.8,"NH":2.9,"NJ":3.4,"NM":3.0,"NY":4.1,"NC":3.6,"ND":3.0,"OH":4.2,"OK":3.9,"OR":3.6,"PA":3.6,"RI":3.0,"SC":5.2,"SD":3.7,"TX":4.1,"UT":3.1,"VT":3.0,"VA":4.0,"WA":3.3,"WV":5.3,"WI":3.4,"WY":3.2},"Female":{"AL":4.6,"AK":4.0,"AZ":4.6,"AR":4.8,"CA":4.2,"CO":3.9,"CT":3.5,"DE":4.1,"DC":2.6,"FL":4.9,"GA":5.0,"HI":4.6,"ID":3.7,"IL":4.2,"IN":5.9,"IA":4.2,"KS":4.4,"KY":6.2,"LA":5.5,"ME":5.2,"MD":3.7,"MA":3.8,"MI":4.5,"MN":4.1,"MS":4.2,"MO":4.7,"MT":3.5,"NE":3.9,"NV":4.4,"NH":3.7,"NJ":3.1,"NM":3.9,"NY":3.4,"NC":3.4,"ND":3.9,"OH":5.1,"OK":4.9,"OR":5.2,"PA":5.8,"RI":3.0,"SC":5.1,"SD":4.3,"TX":4.1,"UT":3.5,"VT":2.5,"VA":4.7,"WA":4.2,"WV":6.2,"WI":4.7,"WY":3.9}}};
+// attach sex breakdowns onto each state condition
+Object.keys(STATE_SEX).forEach(k=>{ if(DATA.state[k]) DATA.state[k].sex = STATE_SEX[k]; });
+
+let ACTIVE_VIEW = "overall";      // tracked for downloads
+let STATE_CTX = null;             // {condId, sex, rec, vals, label, unit} set by state render
+
+const tip = document.getElementById("tip");
+function showTip(e, html){
+  tip.innerHTML = html; tip.classList.add("on");
+  const x = e.clientX, y = e.clientY, w = tip.offsetWidth, h = tip.offsetHeight;
+  let left = x + 15, top = y + 15;
+  if (left + w > innerWidth - 12) left = x - w - 15;
+  if (top + h > innerHeight - 12) top = y - h - 15;
+  tip.style.left = left + "px"; tip.style.top = top + "px";
+}
+function hideTip(){ tip.classList.remove("on"); }
+
+/* ---------- OVERALL ---------- */
+(function(){
+  const AXIS_MAX = 50, chart = document.getElementById("overall-chart");
+  const maxPct = Math.max(...DATA.overall.map(d=>d.pct));
+  const axis = document.createElement("div"); axis.className="axis";
+  axis.style.setProperty("--tickh", (DATA.overall.length*36)+"px");
+  for(let t=0;t<=AXIS_MAX;t+=10){ const tk=document.createElement("div"); tk.className="tick"; tk.style.left=(t/AXIS_MAX*100)+"%"; tk.innerHTML=`<span>${t}</span><i></i>`; axis.appendChild(tk); }
+  chart.appendChild(axis);
+  DATA.overall.forEach(d=>{
+    const row=document.createElement("div"); row.className="row"+(d.pct===maxPct?" hi":""); row.tabIndex=0;
+    row.style.setProperty("--w",(d.pct/AXIS_MAX*100)+"%"); row.style.setProperty("--t",(d.pct/maxPct).toFixed(3));
+    row.innerHTML=`<div class="name"><span>${d.name}</span><span class="cat">${d.cat}</span></div><div class="track"><div class="barwrap"><div class="bar"></div><span class="val">${d.pct}%</span></div></div>`;
+    const html=`<div class="tname">${d.name}</div><div><span class="tpct">${d.pct}%</span> of ${d.base.split(" · ")[0]}${d.count!=="—"?` &middot; ${d.count}`:``}</div><div class="tmeta">${d.cat} &middot; ${d.src}<br>${d.base}</div>`;
+    row.addEventListener("mousemove",e=>showTip(e,html)); row.addEventListener("mouseleave",hideTip);
+    row.addEventListener("focus",()=>{const r=row.getBoundingClientRect();showTip({clientX:r.left+r.width*.45,clientY:r.top+r.height},html);}); row.addEventListener("blur",hideTip);
+    chart.appendChild(row);
+  });
+  const tw=document.getElementById("tablewrap");
+  tw.innerHTML=`<table><thead><tr><th>Condition</th><th>Category</th><th>Prevalence</th><th>People</th><th>Base</th><th>Source</th></tr></thead><tbody>${DATA.overall.map(d=>`<tr><td>${d.name}</td><td>${d.cat}</td><td class="n">${d.pct}%</td><td class="n">${d.count}</td><td>${d.base}</td><td>${d.src}</td></tr>`).join("")}</tbody></table>`;
+  const btn=document.getElementById("tbl-toggle");
+  btn.addEventListener("click",()=>{const on=tw.classList.toggle("on");btn.setAttribute("aria-expanded",on);btn.textContent=on?"Hide data table":"Show data table";});
+})();
+
+/* ---------- AGE ---------- */
+(function(){
+  const grid=document.getElementById("age-grid");
+  DATA.age.conditions.forEach(c=>{
+    const mx=Math.max(...c.pts.map(p=>p[1]));
+    const bars=c.pts.map(p=>{
+      const t=(p[1]/mx).toFixed(3), h=(p[1]/mx*100).toFixed(1);
+      return `<div class="agebar"><div class="av">${p[1]}%</div><div class="col" style="height:${h}%;--t:${t}"></div><div class="al"><b>${p[0]}</b></div></div>`;
+    }).join("");
+    const card=document.createElement("div"); card.className="agecard";
+    card.innerHTML=`<h3>${c.name}</h3><div class="csrc">${c.src}</div><div class="agebars">${bars}</div>`;
+    grid.appendChild(card);
+  });
+})();
+
+/* ---------- TREND ---------- */
+(function(){
+  const grid=document.getElementById("trend-grid");
+  const order=Object.keys(DATA.trend).sort((a,b)=>{const A=DATA.trend[a].series,B=DATA.trend[b].series;return Object.values(B).pop()-Object.values(A).pop();});
+  order.forEach(k=>{
+    const s=DATA.trend[k].series, yrs=Object.keys(s).sort(), vals=yrs.map(y=>s[y]);
+    const n=vals.length, mn=Math.min(...vals), mx=Math.max(...vals), rng=(mx-mn)||1;
+    const W=100,H=40,pad=5;
+    const X=i=>(n===1?W/2:(i/(n-1))*W);
+    const Y=v=>H-pad-((v-mn)/rng)*(H-2*pad);
+    const pts=vals.map((v,i)=>[X(i),Y(v)]);
+    const path=pts.map((p,i)=>(i?"L":"M")+p[0].toFixed(1)+" "+p[1].toFixed(1)).join(" ");
+    const first=vals[0], last=vals[n-1], delta=(last-first);
+    const dcls=delta>0.05?"up":(delta<-0.05?"dn":"");
+    const darrow=delta>0.05?"▲":(delta<-0.05?"▼":"—");
+    const dots=pts.map((p,i)=>`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="2.6" fill="var(--accent)" data-y="${yrs[i]}" data-v="${vals[i]}" style="cursor:pointer"/>`).join("");
+    const card=document.createElement("div"); card.className="sm";
+    card.innerHTML=`<div class="top"><span class="lbl">${DATA.trend[k].label}</span><span class="now">${last}%</span></div>`+
+      `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"><polyline points="${pts.map(p=>p[0].toFixed(1)+","+p[1].toFixed(1)).join(" ")}" fill="none" stroke="var(--accent)" stroke-width="1.6" vector-effect="non-scaling-stroke" stroke-linejoin="round" stroke-linecap="round"/>${dots}</svg>`+
+      `<div class="foot"><span>${yrs[0]}</span><span class="delta ${dcls}">${darrow} ${delta>0?"+":""}${delta.toFixed(1)} pts</span><span>${yrs[n-1]}</span></div>`;
+    card.querySelectorAll("circle").forEach(c=>{
+      c.addEventListener("mousemove",e=>showTip(e,`<div class="tname">${DATA.trend[k].label}</div><div class="tpct">${c.dataset.v}%</div><div class="tmeta">${c.dataset.y} &middot; BRFSS self-reported</div>`));
+      c.addEventListener("mouseleave",hideTip);
+    });
+    grid.appendChild(card);
+  });
+})();
+
+/* ---------- STATE ---------- */
+(function(){
+  const sel=document.getElementById("state-selector"), map=document.getElementById("tilemap"),
+        meta=document.getElementById("map-meta"), list=document.getElementById("state-list"),
+        slo=document.getElementById("scale-lo"), shi=document.getElementById("scale-hi"),
+        sexSel=document.getElementById("sex-selector");
+  const keys=Object.keys(DATA.state);
+  let active=keys[0], sex="all";
+  const SEXLBL={all:"Everyone",Female:"Women",Male:"Men"};
+  keys.forEach(k=>{
+    const b=document.createElement("button"); b.className="chip"; b.textContent=DATA.state[k].label;
+    b.setAttribute("aria-pressed",k===active); b.dataset.k=k;
+    b.addEventListener("click",()=>{active=k;[...sel.children].forEach(c=>c.setAttribute("aria-pressed",c.dataset.k===k));render();});
+    sel.appendChild(b);
+  });
+  [...sexSel.children].forEach(b=>b.addEventListener("click",()=>{
+    sex=b.dataset.sex; [...sexSel.children].forEach(c=>c.setAttribute("aria-pressed",c.dataset.sex===sex)); render();
+  }));
+  function currentVals(rec){ return sex==="all" ? rec.values : (rec.sex ? rec.sex[sex] : {}); }
+  function render(){
+    const rec=DATA.state[active], vals=currentVals(rec);
+    const ks=Object.keys(vals); const nums=ks.map(s=>vals[s]);
+    const mn=Math.min(...nums), mx=Math.max(...nums), rng=(mx-mn)||1;
+    const hiS=ks.reduce((a,b)=>vals[b]>vals[a]?b:a), loS=ks.reduce((a,b)=>vals[b]<vals[a]?b:a);
+    const avgTxt = sex==="all" ? `<span>U.S. avg <b>${rec.us}%</b></span>` : `<span>Showing <b>${SEXLBL[sex]}</b></span>`;
+    meta.innerHTML=`${avgTxt}<span>Highest <b>${STNAME[hiS]} ${vals[hiS]}%</b></span><span>Lowest <b>${STNAME[loS]} ${vals[loS]}%</b></span><span style="color:var(--faint)">BRFSS ${rec.year}</span>`;
+    slo.textContent=mn.toFixed(0)+"%"; shi.textContent=mx.toFixed(0)+"%";
+    map.innerHTML="";
+    Object.keys(DATA.tilegrid).forEach(st=>{
+      const [r,c]=DATA.tilegrid[st], v=vals[st];
+      const tile=document.createElement("div"); tile.style.gridRow=(r+1); tile.style.gridColumn=(c+1);
+      tile.textContent=st;
+      if(v==null){ tile.className="tile na"; tile.title=STNAME[st]+" — no data"; }
+      else{
+        const t=(v-mn)/rng; tile.className="tile";
+        tile.style.background=`color-mix(in oklab, var(--bar-hi), var(--bar-lo) ${((1-t)*100).toFixed(1)}%)`;
+        if(t<0.32) tile.style.color="var(--ink)";
+        const ref = sex==="all" ? `${v>rec.us?"above":"below"} U.S. avg (${rec.us}%)` : SEXLBL[sex];
+        const html=`<div class="tname">${STNAME[st]}</div><div><span class="tpct">${v}%</span></div><div class="tmeta">${rec.label} &middot; ${ref}</div>`;
+        tile.addEventListener("mousemove",e=>showTip(e,html)); tile.addEventListener("mouseleave",hideTip);
+      }
+      map.appendChild(tile);
+    });
+    const sorted=ks.slice().sort((a,b)=>vals[b]-vals[a]);
+    list.innerHTML=sorted.map(st=>{const t=((vals[st]-mn)/rng).toFixed(3),w=((vals[st]-mn)/rng*100).toFixed(1);
+      return `<div class="srow"><span class="sn">${st}</span><div class="strack"><div class="sbar" style="--w:${Math.max(w,4)}%;--t:${t}"></div></div><span class="sv">${vals[st]}%</span></div>`;}).join("");
+    STATE_CTX={condId:active, sex, rec, vals, label:rec.label, mn, mx, rng, hiS, loS};
+  }
+  render();
+})();
+
+/* ---------- REALTIME ---------- */
+(function(){
+  const rt=DATA.realtime;
+  document.getElementById("rt-banner").innerHTML=`<b>As of ${rt.asof}:</b> ${rt.overall} <span style="color:var(--muted)">· ${rt.cadence}</span>`;
+  document.getElementById("rt-grid").innerHTML=rt.items.map(it=>`<div class="rtcard"><div class="rn">${it.name}</div><span class="pill ${it.tone}">${it.level}</span><div class="rnote">${it.note}</div></div>`).join("");
+})();
+
+/* ---------- TABS ---------- */
+(function(){
+  const tabs=[...document.querySelectorAll(".tab")];
+  tabs.forEach(t=>t.addEventListener("click",()=>{
+    tabs.forEach(x=>x.setAttribute("aria-selected",x===t));
+    document.querySelectorAll(".view").forEach(v=>v.classList.remove("on"));
+    document.getElementById("view-"+t.dataset.view).classList.add("on");
+    ACTIVE_VIEW=t.dataset.view;
+    if(window.__syncDL) window.__syncDL();
+    hideTip();
+  }));
+})();
+
+/* ---------- DOWNLOADS (CSV + PNG) ---------- */
+(function(){
+  const csvBtn=document.getElementById("dl-csv"), pngBtn=document.getElementById("dl-png"),
+        status=document.getElementById("dl-status"), toolbar=document.getElementById("dl-toolbar");
+  const has = window.claude && window.claude.downloads;
+  if(!has){ toolbar.style.display="none"; }
+  function cssv(n){ return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+  function say(msg,err){ status.textContent=msg; status.className="dl-status"+(err?" err":""); if(msg) setTimeout(()=>{if(status.textContent===msg)status.textContent="";},4000); }
+
+  async function save(filename, data){
+    try{ await window.claude.downloads.save({filename,data}); say("Saved ✓"); }
+    catch(e){
+      const c=e&&e.code;
+      if(c==="declined") say("Download canceled");
+      else if(c==="extension_not_enabled" && filename.endsWith(".csv")){
+        try{ await window.claude.downloads.save({filename:filename.replace(/\.csv$/,".txt"),data}); say("Saved as .txt ✓"); }
+        catch(e2){ say("Couldn't save ("+((e2&&e2.code)||"error")+")",true); }
+      }
+      else if(c==="rate_limited") say("Please wait a moment, then retry",true);
+      else say("Couldn't save ("+(c||"error")+")",true);
+    }
+  }
+  const q=s=>{s=(s==null?"":String(s)); return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;};
+  const rows2csv=rows=>rows.map(r=>r.map(q).join(",")).join("\r\n");
+
+  // ---- CSV per view ----
+  function csvFor(view){
+    if(view==="overall"){
+      const r=[["Condition","Category","Prevalence_pct","People","Population_base","Source"]];
+      DATA.overall.forEach(d=>r.push([d.name,d.cat,d.pct,d.count,d.base,d.src]));
+      return {name:"us-health_overall-prevalence.csv",data:rows2csv(r)};
+    }
+    if(view==="age"){
+      const r=[["Condition","Age_band","Prevalence_pct","Source"]];
+      DATA.age.conditions.forEach(c=>c.pts.forEach(p=>r.push([c.name,p[0],p[1],c.src])));
+      return {name:"us-health_by-age.csv",data:rows2csv(r)};
+    }
+    if(view==="trend"){
+      const r=[["Condition","Year","Prevalence_pct","Source"]];
+      Object.values(DATA.trend).forEach(t=>Object.keys(t.series).sort().forEach(y=>r.push([t.label,y,t.series[y],"CDC BRFSS (self-reported)"])));
+      return {name:"us-health_trends.csv",data:rows2csv(r)};
+    }
+    if(view==="state"){
+      const cx=STATE_CTX; const sx=cx.sex==="all"?"Everyone":cx.sex;
+      const r=[["State_abbr","State","Condition","Breakdown","Prevalence_pct","Year","Source"]];
+      Object.keys(cx.vals).sort((a,b)=>cx.vals[b]-cx.vals[a]).forEach(st=>
+        r.push([st,STNAME[st],cx.label,sx,cx.vals[st],cx.rec.year,"CDC BRFSS / DNPAO"]));
+      return {name:`us-health_state_${cx.condId.toLowerCase()}_${sx.toLowerCase()}.csv`,data:rows2csv(r)};
+    }
+    if(view==="realtime"){
+      const r=[["Virus","Level","Note","As_of","Source"]];
+      DATA.realtime.items.forEach(it=>r.push([it.name,it.level,it.note,DATA.realtime.asof,"CDC Respiratory Illnesses Data Channel"]));
+      return {name:"us-health_realtime-respiratory.csv",data:rows2csv(r)};
+    }
+  }
+
+  // ---- PNG per view (Canvas 2D, theme-aware, hi-DPI) ----
+  const F="'Helvetica Neue',Arial,sans-serif";
+  function ramp(t){ // approx of color-mix bar-lo..bar-hi in sRGB
+    const lo=hex(cssv("--bar-lo")), hi=hex(cssv("--bar-hi"));
+    const m=(a,b)=>Math.round(a+(b-a)*t);
+    return `rgb(${m(lo[0],hi[0])},${m(lo[1],hi[1])},${m(lo[2],hi[2])})`;
+  }
+  function hex(h){ h=h.replace('#',''); if(h.length===3)h=h.split('').map(x=>x+x).join(''); return [parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)]; }
+  function newCanvas(w,h){ const dpr=Math.max(2,window.devicePixelRatio||1); const cv=document.createElement("canvas"); cv.width=w*dpr; cv.height=h*dpr; const cx=cv.getContext("2d"); cx.scale(dpr,dpr); return {cv,cx,w,h}; }
+  function bg(cx,w,h){ cx.fillStyle=cssv("--panel"); cx.fillRect(0,0,w,h); }
+  function heading(cx,title,sub,w){ cx.textBaseline="alphabetic";
+    cx.fillStyle=cssv("--ink"); cx.font=`600 22px Georgia,serif`; cx.fillText(title,36,46);
+    cx.fillStyle=cssv("--muted"); cx.font=`13px ${F}`; cx.fillText(sub,36,68);
+  }
+  function footer(cx,w,h){ cx.fillStyle=cssv("--faint"); cx.font=`11px ${F}`; cx.fillText("Source: CDC / SAMHSA / NCI · The State of America's Health",36,h-16); }
+
+  function pngOverall(){
+    const items=DATA.overall, rowH=30, top=100, w=900, h=top+items.length*rowH+50;
+    const {cv,cx}=newCanvas(w,h); bg(cx,w,h);
+    heading(cx,"Prevalence among U.S. adults","Share of adults 18+ living with each condition (%)",w);
+    const labW=210, x0=36+labW, plotW=w-x0-70, max=50, mxv=Math.max(...items.map(d=>d.pct));
+    cx.strokeStyle=cssv("--hairline"); cx.lineWidth=1;
+    for(let t=0;t<=max;t+=10){ const x=x0+t/max*plotW; cx.beginPath(); cx.moveTo(x,top-8); cx.lineTo(x,top+items.length*rowH); cx.stroke(); cx.fillStyle=cssv("--faint"); cx.font=`11px ${F}`; cx.textAlign="center"; cx.fillText(t,x,top-14); }
+    cx.textAlign="left";
+    items.forEach((d,i)=>{ const y=top+i*rowH, bw=d.pct/max*plotW, t=d.pct/mxv;
+      cx.fillStyle=cssv("--ink-soft"); cx.font=`600 13px ${F}`; cx.textAlign="right"; cx.fillText(d.name,36+labW-12,y+18);
+      cx.textAlign="left"; cx.fillStyle=ramp(t); roundRect(cx,x0,y+6,Math.max(bw,2),18,4); cx.fill();
+      cx.fillStyle=cssv("--ink-soft"); cx.font=`700 12px ${F}`; cx.fillText(d.pct+"%",x0+bw+8,y+19);
+    });
+    footer(cx,w,h); return {cv,name:"us-health_overall.png"};
+  }
+  function pngAge(){
+    const conds=DATA.age.conditions, w=900, colW=w/conds.length, h=430, top=110, base=h-70, bh=base-top;
+    const {cv,cx}=newCanvas(w,h); bg(cx,w,h);
+    heading(cx,"How prevalence shifts with age","Prevalence by age band (%)",w);
+    conds.forEach((c,ci)=>{ const cx0=ci*colW+40, cw=colW-80, mx=Math.max(...c.pts.map(p=>p[1]));
+      cx.fillStyle=cssv("--ink"); cx.font=`600 14px ${F}`; cx.textAlign="left"; cx.fillText(c.name,cx0,top-14);
+      const n=c.pts.length, gap=12, barW=(cw-gap*(n-1))/n;
+      c.pts.forEach((p,i)=>{ const x=cx0+i*(barW+gap), bh2=p[1]/mx*bh, y=base-bh2, t=p[1]/mx;
+        cx.fillStyle=ramp(t); roundRect(cx,x,y,barW,bh2,5); cx.fill();
+        cx.fillStyle=cssv("--ink-soft"); cx.font=`700 12px ${F}`; cx.textAlign="center"; cx.fillText(p[1]+"%",x+barW/2,y-6);
+        cx.fillStyle=cssv("--muted"); cx.font=`11px ${F}`; cx.fillText(p[0],x+barW/2,base+18);
+      });
+    });
+    cx.textAlign="left"; footer(cx,w,h); return {cv,name:"us-health_by-age.png"};
+  }
+  function pngTrend(){
+    const ent=Object.values(DATA.trend), cols=3, rows=Math.ceil(ent.length/cols),
+          w=900, cardW=w/cols, cardH=150, top=100, h=top+rows*cardH+40;
+    const {cv,cx}=newCanvas(w,h); bg(cx,w,h);
+    heading(cx,"The trend over time","Self-reported prevalence, CDC BRFSS (%)",w);
+    ent.forEach((t,i)=>{ const cxx=(i%cols)*cardW+40, cyy=top+Math.floor(i/cols)*cardH,
+      pw=cardW-80, ph=70, yrs=Object.keys(t.series).sort(), vals=yrs.map(y=>t.series[y]),
+      mn=Math.min(...vals), mx=Math.max(...vals), rng=(mx-mn)||1, n=vals.length;
+      cx.fillStyle=cssv("--ink"); cx.font=`600 13px ${F}`; cx.textAlign="left"; cx.fillText(t.label,cxx,cyy+16);
+      cx.fillStyle=cssv("--accent"); cx.font=`700 15px ${F}`; cx.textAlign="right"; cx.fillText(vals[n-1]+"%",cxx+pw,cyy+16);
+      const gy=cyy+30, gx=cxx; cx.strokeStyle=cssv("--accent"); cx.lineWidth=2; cx.beginPath();
+      vals.forEach((v,j)=>{ const px=gx+(n===1?pw/2:j/(n-1)*pw), py=gy+ph-(v-mn)/rng*ph; j?cx.lineTo(px,py):cx.moveTo(px,py); }); cx.stroke();
+      const lx=gx+pw, ly=gy+ph-(vals[n-1]-mn)/rng*ph; cx.fillStyle=cssv("--accent"); cx.beginPath(); cx.arc(lx,ly,3.5,0,7); cx.fill();
+      cx.fillStyle=cssv("--faint"); cx.font=`10px ${F}`; cx.textAlign="left"; cx.fillText(yrs[0],gx,gy+ph+16); cx.textAlign="right"; cx.fillText(yrs[n-1],gx+pw,gy+ph+16);
+    });
+    cx.textAlign="left"; footer(cx,w,h); return {cv,name:"us-health_trends.png"};
+  }
+  function pngState(){
+    const cx0=STATE_CTX, vals=cx0.vals, w=900, h=620, top=120;
+    const {cv,cx}=newCanvas(w,h); bg(cx,w,h);
+    const sx=cx0.sex==="all"?"Everyone":cx0.sex;
+    heading(cx,cx0.label+" by state",`CDC BRFSS ${cx0.rec.year} · ${sx} · darker = higher (%)`,w);
+    const cell=52, gap=6, gx=40, gy=top;
+    Object.keys(DATA.tilegrid).forEach(st=>{ const [r,c]=DATA.tilegrid[st], v=vals[st];
+      const x=gx+c*(cell+gap), y=gy+r*(cell+gap);
+      if(v==null){ cx.fillStyle=cssv("--panel-2"); roundRect(cx,x,y,cell,cell,5); cx.fill(); cx.strokeStyle=cssv("--hairline"); cx.stroke(); cx.fillStyle=cssv("--faint"); }
+      else{ const t=(v-cx0.mn)/cx0.rng; cx.fillStyle=ramp(t); roundRect(cx,x,y,cell,cell,5); cx.fill(); cx.fillStyle=t<0.32?cssv("--ink"):"#fff"; }
+      cx.font=`700 11px ${F}`; cx.textAlign="center"; cx.fillText(st,x+cell/2,y+cell/2-2);
+      if(v!=null){ cx.font=`10px ${F}`; cx.fillText(v+"%",x+cell/2,y+cell/2+12); }
+    });
+    cx.textAlign="left"; cx.fillStyle=cssv("--ink-soft"); cx.font=`13px ${F}`;
+    cx.fillText(`Highest: ${STNAME[cx0.hiS]} ${vals[cx0.hiS]}%   ·   Lowest: ${STNAME[cx0.loS]} ${vals[cx0.loS]}%`,40,h-46);
+    footer(cx,w,h); return {cv,name:`us-health_state_${cx0.condId.toLowerCase()}_${sx.toLowerCase()}.png`};
+  }
+  function pngRealtime(){
+    const rt=DATA.realtime, w=900, h=300; const {cv,cx}=newCanvas(w,h); bg(cx,w,h);
+    heading(cx,"Real-time respiratory surveillance","As of "+rt.asof+" · "+rt.cadence,w);
+    const n=rt.items.length, cardW=(w-80-(n-1)*16)/n;
+    rt.items.forEach((it,i)=>{ const x=40+i*(cardW+16), y=100;
+      cx.fillStyle=cssv("--panel-2"); roundRect(cx,x,y,cardW,140,10); cx.fill();
+      cx.fillStyle=cssv("--ink"); cx.font=`700 16px ${F}`; cx.textAlign="left"; cx.fillText(it.name,x+16,y+30);
+      cx.fillStyle=cssv("--good"); cx.beginPath(); cx.arc(x+22,y+52,5,0,7); cx.fill();
+      cx.font=`700 13px ${F}`; cx.fillText(it.level,x+34,y+56);
+      cx.fillStyle=cssv("--muted"); cx.font=`11px ${F}`; wrap(cx,it.note,x+16,y+80,cardW-32,15);
+    });
+    footer(cx,w,h); return {cv,name:"us-health_realtime.png"};
+  }
+  function wrap(cx,text,x,y,maxw,lh){ const words=text.split(" "); let line="",yy=y;
+    words.forEach(wd=>{ const test=line?line+" "+wd:wd; if(cx.measureText(test).width>maxw){ cx.fillText(line,x,yy); line=wd; yy+=lh; } else line=test; }); cx.fillText(line,x,yy); }
+  function roundRect(cx,x,y,w,h,r){ r=Math.min(r,w/2,h/2); cx.beginPath(); cx.moveTo(x+r,y); cx.arcTo(x+w,y,x+w,y+h,r); cx.arcTo(x+w,y+h,x,y+h,r); cx.arcTo(x,y+h,x,y,r); cx.arcTo(x,y,x+w,y,r); cx.closePath(); }
+
+  const PNG={overall:pngOverall,age:pngAge,trend:pngTrend,state:pngState,realtime:pngRealtime};
+
+  csvBtn.addEventListener("click",()=>{ const o=csvFor(ACTIVE_VIEW); if(o) save(o.name,o.data); });
+  pngBtn.addEventListener("click",()=>{
+    const gen=PNG[ACTIVE_VIEW]; if(!gen) return;
+    const {cv,name}=gen();
+    cv.toBlob(b=>{ if(!b){say("Couldn't render image",true);return;} save(name,b); },"image/png");
+  });
+
+  window.__syncDL=function(){ status.textContent=""; status.className="dl-status"; };
+  window.__dltest={PNG,csvFor}; // smoke-test hook
+})();
+</script>

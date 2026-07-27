@@ -1,0 +1,664 @@
+<title>The State of America's Health</title>
+<style>
+  :root {
+    --bg: #f7f9fb; --panel: #ffffff; --panel-2: #f2f6f9;
+    --ink: #13202b; --ink-soft: #35485a; --muted: #5f7183; --faint: #8496a6;
+    --hairline: #e3e9ee; --hairline-strong: #d3dbe2;
+    --accent: #1f5f9e; --accent-soft: #eaf1f8;
+    --bar-lo: #cce0f1; --bar-hi: #1f5f9e;
+    --good: #2f8f6b; --good-soft: #e6f3ee;
+    --shadow: 0 1px 2px rgba(19,32,43,.05), 0 8px 24px rgba(19,32,43,.06);
+    --f-display: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+    --f-body: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --f-num: "SF Mono", ui-monospace, "Cascadia Mono", "Roboto Mono", Menlo, monospace;
+    --maxw: 980px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0e141a; --panel: #161e26; --panel-2: #1b242d;
+      --ink: #e9eff4; --ink-soft: #c2ced8; --muted: #93a4b3; --faint: #6f8291;
+      --hairline: #253039; --hairline-strong: #31404b;
+      --accent: #6aa9e6; --accent-soft: #17242f;
+      --bar-lo: #253a4b; --bar-hi: #5ea3e2;
+      --good: #4bb98c; --good-soft: #142720;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 28px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="light"]{--bg:#f7f9fb;--panel:#fff;--panel-2:#f2f6f9;--ink:#13202b;--ink-soft:#35485a;--muted:#5f7183;--faint:#8496a6;--hairline:#e3e9ee;--hairline-strong:#d3dbe2;--accent:#1f5f9e;--accent-soft:#eaf1f8;--bar-lo:#cce0f1;--bar-hi:#1f5f9e;--good:#2f8f6b;--good-soft:#e6f3ee;--shadow:0 1px 2px rgba(19,32,43,.05),0 8px 24px rgba(19,32,43,.06);}
+  :root[data-theme="dark"]{--bg:#0e141a;--panel:#161e26;--panel-2:#1b242d;--ink:#e9eff4;--ink-soft:#c2ced8;--muted:#93a4b3;--faint:#6f8291;--hairline:#253039;--hairline-strong:#31404b;--accent:#6aa9e6;--accent-soft:#17242f;--bar-lo:#253a4b;--bar-hi:#5ea3e2;--good:#4bb98c;--good-soft:#142720;--shadow:0 1px 2px rgba(0,0,0,.3),0 10px 28px rgba(0,0,0,.35);}
+
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font-family:var(--f-body); line-height:1.55; -webkit-font-smoothing:antialiased; }
+  .wrap { max-width:var(--maxw); margin:0 auto; padding:48px 22px 88px; }
+  a { color:var(--accent); }
+
+  .eyebrow { font-size:.72rem; letter-spacing:.16em; text-transform:uppercase; color:var(--accent); font-weight:650; margin:0 0 12px; }
+  h1 { font-family:var(--f-display); font-weight:600; font-size:clamp(2rem,5.4vw,3.25rem); line-height:1.04; letter-spacing:-.01em; text-wrap:balance; margin:0 0 16px; }
+  .dek { font-size:1.08rem; color:var(--ink-soft); max-width:62ch; margin:0 0 20px; text-wrap:pretty; }
+  .vintage { display:flex; flex-wrap:wrap; gap:8px 18px; font-size:.8rem; color:var(--muted); border-top:1px solid var(--hairline); padding-top:14px; }
+  .vintage b { color:var(--ink-soft); font-weight:600; }
+
+  /* Tabs */
+  .tabs { position:sticky; top:0; z-index:20; display:flex; flex-wrap:wrap; gap:4px; margin:30px 0 34px; padding:8px 0; background:linear-gradient(var(--bg) 72%, transparent); }
+  .tab { font-family:var(--f-body); font-size:.9rem; font-weight:600; color:var(--muted); background:transparent; border:1px solid transparent; border-radius:9px; padding:9px 15px; cursor:pointer; white-space:nowrap; }
+  .tab:hover { color:var(--ink); background:var(--panel-2); }
+  .tab[aria-selected="true"] { color:var(--accent); background:var(--accent-soft); border-color:var(--hairline-strong); }
+  .tab:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+
+  .view { display:none; }
+  .view.on { display:block; animation:fade .2s ease; }
+  @keyframes fade { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:none} }
+
+  .sec-head { margin:0 0 6px; display:flex; align-items:baseline; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+  .sec-head h2 { font-family:var(--f-display); font-weight:600; font-size:1.5rem; letter-spacing:-.01em; margin:0; }
+  .sec-note { font-size:.86rem; color:var(--muted); margin:0 0 22px; max-width:74ch; }
+  .sec-note b { color:var(--ink-soft); }
+
+  .toggle { font-family:var(--f-body); font-size:.8rem; font-weight:600; color:var(--accent); background:var(--accent-soft); border:1px solid var(--hairline-strong); border-radius:999px; padding:6px 14px; cursor:pointer; white-space:nowrap; }
+  .toggle:hover { border-color:var(--accent); }
+  .toggle:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+
+  /* Hero stats */
+  .stats { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin:0 0 40px; }
+  .stat { background:var(--panel); border:1px solid var(--hairline); border-radius:12px; padding:20px; box-shadow:var(--shadow); }
+  .stat .big { font-family:var(--f-display); font-size:2.4rem; line-height:1; font-weight:600; letter-spacing:-.02em; color:var(--accent); font-variant-numeric:tabular-nums; }
+  .stat .lab { margin-top:8px; font-size:.9rem; color:var(--ink-soft); }
+  .stat .sub { margin-top:3px; font-size:.76rem; color:var(--faint); }
+
+  /* Chart / bars */
+  .chart { background:var(--panel); border:1px solid var(--hairline); border-radius:14px; padding:22px 24px 14px; box-shadow:var(--shadow); position:relative; }
+  .axis { position:relative; height:18px; margin-left:var(--labw); margin-bottom:6px; border-bottom:1px solid var(--hairline); }
+  .tick { position:absolute; top:0; bottom:-6px; transform:translateX(-50%); }
+  .tick span { position:absolute; top:0; left:50%; transform:translateX(-50%); font-size:.68rem; color:var(--faint); font-variant-numeric:tabular-nums; }
+  .tick i { position:absolute; top:16px; height:var(--tickh,600px); left:50%; width:1px; background:var(--hairline); }
+  .row { --labw:210px; display:grid; grid-template-columns:var(--labw) 1fr; align-items:center; padding:5px 0; }
+  .row .name { padding-right:14px; font-size:.9rem; line-height:1.2; display:flex; flex-direction:column; gap:2px; text-align:right; }
+  .row .name .cat { font-size:.62rem; letter-spacing:.09em; text-transform:uppercase; color:var(--faint); font-weight:600; }
+  .track { position:relative; height:26px; }
+  .barwrap { position:relative; height:100%; }
+  .bar { height:100%; border-radius:3px 5px 5px 3px; background:color-mix(in oklab, var(--bar-hi), var(--bar-lo) calc((1 - var(--t)) * 100%)); width:var(--w); min-width:3px; transition:filter .12s ease, width .5s ease; }
+  .row:hover .bar, .row:focus-within .bar { filter:saturate(1.15) brightness(1.05); }
+  .val { position:absolute; top:50%; transform:translateY(-50%); left:calc(var(--w) + 8px); font-family:var(--f-num); font-size:.82rem; font-weight:600; color:var(--ink-soft); font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .row.hi .val { color:var(--accent); }
+  .axis-cap { margin-left:var(--labw); font-size:.72rem; color:var(--faint); padding-top:6px; }
+
+  /* Tooltip */
+  #tip { position:fixed; z-index:60; pointer-events:none; opacity:0; background:var(--ink); color:var(--bg); border-radius:9px; padding:10px 12px; max-width:250px; box-shadow:0 8px 30px rgba(0,0,0,.28); font-size:.79rem; line-height:1.4; transition:opacity .1s ease; }
+  #tip.on { opacity:1; }
+  #tip .tname { font-weight:700; font-size:.85rem; margin-bottom:2px; }
+  #tip .tpct { font-family:var(--f-num); font-weight:700; }
+  #tip .tmeta { color:color-mix(in oklab, var(--bg), var(--ink) 34%); margin-top:5px; font-size:.71rem; }
+
+  /* Age view */
+  .agegrid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+  .agecard { background:var(--panel); border:1px solid var(--hairline); border-radius:14px; padding:20px; box-shadow:var(--shadow); }
+  .agecard h3 { margin:0 0 2px; font-family:var(--f-body); font-size:1.02rem; font-weight:650; }
+  .agecard .csrc { font-size:.7rem; color:var(--faint); margin-bottom:16px; }
+  .agebars { display:flex; align-items:flex-end; gap:12px; height:180px; }
+  .agebar { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; height:100%; }
+  .agebar .col { width:100%; border-radius:5px 5px 0 0; background:color-mix(in oklab, var(--bar-hi), var(--bar-lo) calc((1 - var(--t)) * 100%)); min-height:4px; transition:height .5s ease; }
+  .agebar .av { font-family:var(--f-num); font-weight:700; font-size:.9rem; margin-bottom:6px; color:var(--ink-soft); font-variant-numeric:tabular-nums; }
+  .agebar .al { margin-top:8px; font-size:.72rem; color:var(--muted); text-align:center; }
+  .agebar .al b { display:block; color:var(--ink); font-size:.78rem; }
+
+  /* Trend small multiples */
+  .smgrid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+  .sm { background:var(--panel); border:1px solid var(--hairline); border-radius:12px; padding:16px 16px 12px; box-shadow:var(--shadow); }
+  .sm .top { display:flex; justify-content:space-between; align-items:baseline; gap:8px; }
+  .sm .lbl { font-size:.88rem; font-weight:650; }
+  .sm .now { font-family:var(--f-num); font-size:1.15rem; font-weight:700; color:var(--accent); font-variant-numeric:tabular-nums; }
+  .sm svg { display:block; width:100%; height:52px; margin:10px 0 6px; overflow:visible; }
+  .sm .foot { display:flex; justify-content:space-between; font-size:.68rem; color:var(--faint); font-variant-numeric:tabular-nums; }
+  .sm .delta { font-weight:650; }
+  .sm .delta.up { color:var(--accent); }
+  .sm .delta.dn { color:var(--good); }
+
+  /* State view */
+  /* Download toolbar */
+  .dl-toolbar { display:flex; align-items:center; gap:8px; margin:-18px 0 30px; flex-wrap:wrap; }
+  .dl-lbl { font-size:.72rem; letter-spacing:.09em; text-transform:uppercase; color:var(--faint); font-weight:600; margin-right:2px; }
+  .dl-btn { font-family:var(--f-body); font-size:.8rem; font-weight:600; color:var(--ink-soft); background:var(--panel); border:1px solid var(--hairline-strong); border-radius:8px; padding:6px 12px; cursor:pointer; }
+  .dl-btn:hover { border-color:var(--accent); color:var(--accent); }
+  .dl-btn:disabled { opacity:.5; cursor:default; }
+  .dl-btn:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+  .dl-status { font-size:.78rem; color:var(--muted); }
+  .dl-status.err { color:#c0563f; }
+  /* Sex / segmented toggle */
+  .subsel-row { display:flex; align-items:center; gap:10px; margin-bottom:18px; }
+  .subsel-lbl { font-size:.72rem; letter-spacing:.09em; text-transform:uppercase; color:var(--faint); font-weight:600; }
+  .subsel { display:inline-flex; background:var(--panel-2); border:1px solid var(--hairline-strong); border-radius:9px; padding:3px; gap:2px; }
+  .segbtn { font-family:var(--f-body); font-size:.8rem; font-weight:600; color:var(--muted); background:transparent; border:none; border-radius:7px; padding:5px 13px; cursor:pointer; }
+  .segbtn:hover { color:var(--ink); }
+  .segbtn[aria-pressed="true"] { color:var(--accent); background:var(--panel); box-shadow:0 1px 2px rgba(0,0,0,.08); }
+  .segbtn:focus-visible { outline:2px solid var(--accent); outline-offset:1px; }
+  .selector { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:18px; }
+  .chip { font-family:var(--f-body); font-size:.8rem; font-weight:600; color:var(--muted); background:var(--panel); border:1px solid var(--hairline-strong); border-radius:999px; padding:6px 13px; cursor:pointer; }
+  .chip:hover { color:var(--ink); border-color:var(--accent); }
+  .chip[aria-pressed="true"] { color:#fff; background:var(--accent); border-color:var(--accent); }
+  :root[data-theme="dark"] .chip[aria-pressed="true"], @media (prefers-color-scheme:dark){ .chip[aria-pressed="true"]{ color:#0e141a; } }
+  .statewrap { display:grid; grid-template-columns:1.15fr .85fr; gap:22px; align-items:start; }
+  .mapcard { background:var(--panel); border:1px solid var(--hairline); border-radius:14px; padding:20px; box-shadow:var(--shadow); }
+  .mapmeta { display:flex; flex-wrap:wrap; gap:6px 16px; font-size:.8rem; color:var(--muted); margin-bottom:14px; }
+  .mapmeta b { color:var(--ink); font-variant-numeric:tabular-nums; }
+  .tilemap { display:grid; grid-template-columns:repeat(12,1fr); grid-auto-rows:1fr; gap:4px; }
+  .tilemap::before { content:""; grid-column:1; grid-row:1; padding-bottom:100%; }
+  .tile { position:relative; border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:.6rem; font-weight:700; color:#fff; cursor:default; aspect-ratio:1; border:1px solid transparent; }
+  .tile.na { background:var(--panel-2)!important; color:var(--faint); border-color:var(--hairline); }
+  .tile:hover { outline:2px solid var(--ink); outline-offset:1px; z-index:2; }
+  .scale { display:flex; align-items:center; gap:10px; margin-top:16px; font-size:.72rem; color:var(--muted); }
+  .scalebar { flex:1; height:10px; border-radius:5px; background:linear-gradient(90deg, var(--bar-lo), var(--bar-hi)); }
+  .statelist { max-height:520px; overflow-y:auto; padding-right:6px; }
+  .srow { display:grid; grid-template-columns:34px 1fr auto; align-items:center; gap:8px; padding:3px 0; font-size:.82rem; }
+  .srow .sn { color:var(--ink-soft); font-weight:600; }
+  .srow .strack { height:14px; background:var(--panel-2); border-radius:4px; overflow:hidden; }
+  .srow .sbar { height:100%; border-radius:4px; background:color-mix(in oklab, var(--bar-hi), var(--bar-lo) calc((1 - var(--t)) * 100%)); width:var(--w); }
+  .srow .sv { font-family:var(--f-num); font-variant-numeric:tabular-nums; color:var(--muted); }
+
+  /* Real-time */
+  .rtbanner { background:var(--good-soft); border:1px solid var(--hairline); border-left:3px solid var(--good); border-radius:12px; padding:16px 18px; margin-bottom:18px; font-size:.95rem; color:var(--ink-soft); }
+  .rtbanner b { color:var(--ink); }
+  .rtgrid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:22px; }
+  .rtcard { background:var(--panel); border:1px solid var(--hairline); border-radius:12px; padding:18px; box-shadow:var(--shadow); }
+  .rtcard .rn { font-weight:700; font-size:1rem; margin-bottom:8px; }
+  .pill { display:inline-flex; align-items:center; gap:6px; font-size:.78rem; font-weight:700; padding:4px 10px; border-radius:999px; }
+  .pill.good { background:var(--good-soft); color:var(--good); }
+  .pill.good::before { content:""; width:8px; height:8px; border-radius:50%; background:var(--good); }
+  .pill.warn { background:rgba(200,140,20,.14); color:#b4740f; } .pill.warn::before{content:"";width:8px;height:8px;border-radius:50%;background:#c8891a;}
+  .pill.high { background:rgba(193,71,90,.14); color:#c1475a; } .pill.high::before{content:"";width:8px;height:8px;border-radius:50%;background:#c1475a;}
+  .rtcard .rnote { margin-top:10px; font-size:.82rem; color:var(--muted); }
+  .livelinks { display:flex; flex-wrap:wrap; gap:10px; margin-top:6px; }
+  .livelink { display:inline-flex; align-items:center; gap:6px; font-size:.85rem; font-weight:600; text-decoration:none; color:var(--accent); background:var(--accent-soft); border:1px solid var(--hairline-strong); border-radius:9px; padding:9px 14px; }
+  .livelink:hover { border-color:var(--accent); }
+
+  .tablewrap { overflow-x:auto; margin-top:14px; display:none; }
+  .tablewrap.on { display:block; }
+  table { border-collapse:collapse; width:100%; font-size:.84rem; }
+  th,td { text-align:left; padding:8px 12px; border-bottom:1px solid var(--hairline); }
+  th { color:var(--muted); font-weight:600; font-size:.72rem; text-transform:uppercase; letter-spacing:.05em; }
+  td.n { font-family:var(--f-num); font-variant-numeric:tabular-nums; text-align:right; }
+
+  .note { background:var(--accent-soft); border:1px solid var(--hairline); border-left:3px solid var(--accent); border-radius:10px; padding:18px 20px; margin-top:22px; }
+  .note h3 { margin:0 0 10px; font-size:.95rem; font-family:var(--f-body); font-weight:700; }
+  .note ul { margin:0; padding-left:18px; }
+  .note li { font-size:.85rem; color:var(--ink-soft); margin-bottom:7px; }
+  .note li:last-child { margin-bottom:0; }
+
+  .sources { margin-top:30px; font-size:.8rem; color:var(--muted); }
+  .sources h3 { font-size:.72rem; text-transform:uppercase; letter-spacing:.1em; color:var(--faint); margin:0 0 8px; }
+  .sources a { text-decoration:none; }
+  .sources a:hover { text-decoration:underline; }
+  .sources li { margin-bottom:4px; }
+  .divider { height:1px; background:var(--hairline); margin:44px 0; border:0; }
+
+  @media (max-width:760px){
+    .stats,.agegrid,.smgrid,.rtgrid { grid-template-columns:1fr; }
+    .statewrap { grid-template-columns:1fr; }
+    .row { --labw:120px; }
+    .row .name { font-size:.78rem; }
+    .tile { font-size:.5rem; }
+  }
+  @media (prefers-reduced-motion:reduce){ *{ transition:none!important; animation:none!important; } }
+</style>
+
+<div class="wrap">
+  <p class="eyebrow">U.S. Population Health · Data Synthesis</p>
+  <h1>The state of America's health</h1>
+  <p class="dek">How common the major health conditions are across the U.S. population — the whole picture, then broken out by age, over time, and state by state. Explore the five views below.</p>
+  <div class="vintage">
+    <span><b>Population base:</b> ~262M U.S. adults (18+)</span>
+    <span><b>Sources:</b> CDC (NHANES · BRFSS · NHIS), SAMHSA, NCI</span>
+    <span><b>Data years:</b> 2019–2024</span>
+  </div>
+
+  <div class="tabs" role="tablist" aria-label="Views">
+    <button class="tab" role="tab" data-view="overall" aria-selected="true">Overall</button>
+    <button class="tab" role="tab" data-view="age" aria-selected="false">By age</button>
+    <button class="tab" role="tab" data-view="trend" aria-selected="false">Over time</button>
+    <button class="tab" role="tab" data-view="state" aria-selected="false">By state</button>
+    <button class="tab" role="tab" data-view="realtime" aria-selected="false">Real-time</button>
+  </div>
+
+  <div class="dl-toolbar" id="dl-toolbar">
+    <span class="dl-lbl">Export this view</span>
+    <button class="dl-btn" id="dl-csv" type="button">⤓ CSV</button>
+    <button class="dl-btn" id="dl-png" type="button">⤓ PNG</button>
+    <span class="dl-status" id="dl-status" role="status" aria-live="polite"></span>
+  </div>
+
+  <!-- OVERALL -->
+  <section class="view on" id="view-overall" role="tabpanel">
+    <div class="stats">
+      <div class="stat"><div class="big">6 in 10</div><div class="lab">adults live with at least one chronic disease</div><div class="sub">CDC</div></div>
+      <div class="stat"><div class="big">4 in 10</div><div class="lab">live with two or more chronic conditions at once</div><div class="sub">CDC</div></div>
+      <div class="stat"><div class="big">~48%</div><div class="lab">have high blood pressure — the most widespread condition</div><div class="sub">CDC · NHANES 2021–23</div></div>
+    </div>
+    <div class="sec-head">
+      <h2>Prevalence among U.S. adults</h2>
+      <button class="toggle" id="tbl-toggle" aria-expanded="false">Show data table</button>
+    </div>
+    <p class="sec-note">Each bar is the share of adults 18+ living with that condition (substance use disorder is age 12+). Because most people have more than one, the bars overlap heavily and do <b>not</b> add to 100%.</p>
+    <div class="chart" id="overall-chart"></div>
+    <p class="axis-cap">Share of U.S. adult population (%)</p>
+    <div class="tablewrap" id="tablewrap"></div>
+
+    <hr class="divider" />
+    <div class="sec-head"><h2>Measured on a different base</h2></div>
+    <p class="sec-note">Important, but counted against a different population — so they aren't on the scale above.</p>
+    <div class="stats">
+      <div class="stat"><div class="big">~18.6M</div><div class="lab">cancer survivors — about 6% of the total U.S. population</div><div class="sub">NCI</div></div>
+      <div class="stat"><div class="big">~14%</div><div class="lab">of adults 65+ live with Alzheimer's or dementia (~7M)</div><div class="sub">Alzheimer's Association / CDC</div></div>
+      <div class="stat"><div class="big">~7%</div><div class="lab">of adults have high-impact chronic pain that limits daily life</div><div class="sub">CDC 2021</div></div>
+    </div>
+  </section>
+
+  <!-- AGE -->
+  <section class="view" id="view-age" role="tabpanel">
+    <div class="sec-head"><h2>How prevalence shifts with age</h2></div>
+    <p class="sec-note">Most conditions climb steeply with age — but not all the same way. Blood pressure and diabetes rise relentlessly; <b>obesity peaks in middle age and eases in the oldest group</b>. Bands differ slightly by survey; each is labeled.</p>
+    <div class="agegrid" id="age-grid"></div>
+    <p class="sec-note" style="margin-top:18px">Sources: high blood pressure &amp; obesity — CDC NHANES (measured), Aug 2021–Aug 2023; diabetes — CDC NHIS 2022 (diagnosed, approximate).</p>
+  </section>
+
+  <!-- TREND -->
+  <section class="view" id="view-trend" role="tabpanel">
+    <div class="sec-head"><h2>The trend over time</h2></div>
+    <p class="sec-note">Self-reported prevalence among U.S. adults, from CDC's BRFSS survey. Diabetes, depression, and asthma have climbed steadily; others are flatter. Hover a point for its year and value. <b>Note:</b> BRFSS is self-reported, so levels run lower than the measured NHANES figures in the Overall view — the useful signal here is direction, not the absolute number.</p>
+    <div class="smgrid" id="trend-grid"></div>
+  </section>
+
+  <!-- STATE -->
+  <section class="view" id="view-state" role="tabpanel">
+    <div class="sec-head"><h2>State by state</h2></div>
+    <p class="sec-note">Pick a condition, then split it by sex. Darker means higher prevalence. Values are CDC BRFSS self-reported estimates (obesity from CDC DNPAO); hover any state for its rate. Use <b>⤓ CSV / PNG</b> above to export exactly what you're viewing.</p>
+    <div class="selector" id="state-selector" role="group" aria-label="Choose a condition"></div>
+    <div class="subsel-row">
+      <span class="subsel-lbl">Breakdown</span>
+      <div class="subsel" id="sex-selector" role="group" aria-label="Choose a sex breakdown">
+        <button class="segbtn" data-sex="all" aria-pressed="true" type="button">Everyone</button>
+        <button class="segbtn" data-sex="Female" aria-pressed="false" type="button">Women</button>
+        <button class="segbtn" data-sex="Male" aria-pressed="false" type="button">Men</button>
+      </div>
+    </div>
+    <div class="statewrap">
+      <div class="mapcard">
+        <div class="mapmeta" id="map-meta"></div>
+        <div class="tilemap" id="tilemap"></div>
+        <div class="scale"><span id="scale-lo"></span><div class="scalebar"></div><span id="scale-hi"></span></div>
+      </div>
+      <div>
+        <div class="statelist" id="state-list"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- REALTIME -->
+  <section class="view" id="view-realtime" role="tabpanel">
+    <div class="sec-head"><h2>Real-time surveillance</h2></div>
+    <p class="sec-note">The chronic-condition data in the other views comes from surveys refreshed every 1–2 years — there is no live feed for it. The one part of U.S. population health that <b>is</b> tracked in near-real-time is infectious respiratory disease, via emergency-department visits and wastewater. Below is the latest CDC snapshot; the figures refresh weekly at the source.</p>
+    <div class="rtbanner" id="rt-banner"></div>
+    <div class="rtgrid" id="rt-grid"></div>
+    <div class="note" style="margin-top:0">
+      <h3>Why this isn't auto-updating</h3>
+      <ul>
+        <li>This page is a self-contained document and can't call live data services, so these values are a <b>snapshot</b>, not a live stream. Re-open the CDC dashboards below for the current week, or ask me to refresh the page.</li>
+        <li>CDC updates respiratory and wastewater data <b>every Friday</b>. Wastewater often gives the earliest signal because it doesn't depend on people seeking care.</li>
+      </ul>
+      <div class="livelinks" style="margin-top:14px">
+        <a class="livelink" href="https://www.cdc.gov/respiratory-viruses/data/index.html" target="_blank" rel="noopener">Respiratory Illnesses Data Channel →</a>
+        <a class="livelink" href="https://www.cdc.gov/wastewater/respiratory-viruses/national.html" target="_blank" rel="noopener">Wastewater Surveillance →</a>
+        <a class="livelink" href="https://www.cdc.gov/nssp/php/data-research/dashboards/index.html" target="_blank" rel="noopener">Syndromic (ED visits) →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- shared caveats + sources -->
+  <div class="note">
+    <h3>How to read this — and what it doesn't say</h3>
+    <ul>
+      <li><b>The figures overlap.</b> One person often lives with several conditions at once, so prevalences can't be summed.</li>
+      <li><b>It's a patchwork of surveys.</b> Overall figures use the most authoritative source per condition (often NHANES, which physically measures people); the age, trend, and state views use BRFSS (self-reported by phone), which runs lower. Compare within a view, not across.</li>
+      <li><b>Many cases are undiagnosed</b> — especially prediabetes, diabetes, kidney disease, and high blood pressure. Self-reported views miss people who don't know they're affected (e.g., BRFSS kidney disease ~4% vs. ~14% when measured).</li>
+      <li><b>Prevalence isn't severity</b>, and estimates carry a margin of error.</li>
+    </ul>
+  </div>
+
+  <div class="sources">
+    <h3>Sources</h3>
+    <ul>
+      <li><a href="https://www.cdc.gov/high-blood-pressure/data-research/facts-stats/index.html" target="_blank" rel="noopener">CDC — High Blood Pressure Facts</a></li>
+      <li><a href="https://www.cdc.gov/nchs/products/databriefs/db508.htm" target="_blank" rel="noopener">CDC NCHS — Obesity Prevalence in Adults (Data Brief 508)</a></li>
+      <li><a href="https://www.cdc.gov/diabetes/php/data-research/index.html" target="_blank" rel="noopener">CDC — National Diabetes Statistics Report</a></li>
+      <li><a href="https://data.cdc.gov/" target="_blank" rel="noopener">CDC BRFSS Prevalence Data &amp; DNPAO (state / trend figures, via data.cdc.gov)</a></li>
+      <li><a href="https://www.naco.org/news/samhsa-releases-new-2024-data-rates-mental-illness-and-substance-use-disorder-us" target="_blank" rel="noopener">SAMHSA — 2024 NSDUH (mental illness &amp; substance use)</a></li>
+      <li><a href="https://www.cdc.gov/respiratory-viruses/data/index.html" target="_blank" rel="noopener">CDC — Respiratory Illnesses Data Channel (real-time)</a></li>
+    </ul>
+  </div>
+</div>
+
+<div id="tip" role="status" aria-live="polite"></div>
+
+<script>
+const DATA = /*__DATA__*/;
+const STNAME = {AL:"Alabama",AK:"Alaska",AZ:"Arizona",AR:"Arkansas",CA:"California",CO:"Colorado",CT:"Connecticut",DE:"Delaware",DC:"District of Columbia",FL:"Florida",GA:"Georgia",HI:"Hawaii",ID:"Idaho",IL:"Illinois",IN:"Indiana",IA:"Iowa",KS:"Kansas",KY:"Kentucky",LA:"Louisiana",ME:"Maine",MD:"Maryland",MA:"Massachusetts",MI:"Michigan",MN:"Minnesota",MS:"Mississippi",MO:"Missouri",MT:"Montana",NE:"Nebraska",NV:"Nevada",NH:"New Hampshire",NJ:"New Jersey",NM:"New Mexico",NY:"New York",NC:"North Carolina",ND:"North Dakota",OH:"Ohio",OK:"Oklahoma",OR:"Oregon",PA:"Pennsylvania",RI:"Rhode Island",SC:"South Carolina",SD:"South Dakota",TN:"Tennessee",TX:"Texas",UT:"Utah",VT:"Vermont",VA:"Virginia",WA:"Washington",WV:"West Virginia",WI:"Wisconsin",WY:"Wyoming"};
+
+const STATE_SEX = /*__SEX__*/;
+// attach sex breakdowns onto each state condition
+Object.keys(STATE_SEX).forEach(k=>{ if(DATA.state[k]) DATA.state[k].sex = STATE_SEX[k]; });
+
+let ACTIVE_VIEW = "overall";      // tracked for downloads
+let STATE_CTX = null;             // {condId, sex, rec, vals, label, unit} set by state render
+
+const tip = document.getElementById("tip");
+function showTip(e, html){
+  tip.innerHTML = html; tip.classList.add("on");
+  const x = e.clientX, y = e.clientY, w = tip.offsetWidth, h = tip.offsetHeight;
+  let left = x + 15, top = y + 15;
+  if (left + w > innerWidth - 12) left = x - w - 15;
+  if (top + h > innerHeight - 12) top = y - h - 15;
+  tip.style.left = left + "px"; tip.style.top = top + "px";
+}
+function hideTip(){ tip.classList.remove("on"); }
+
+/* ---------- OVERALL ---------- */
+(function(){
+  const AXIS_MAX = 50, chart = document.getElementById("overall-chart");
+  const maxPct = Math.max(...DATA.overall.map(d=>d.pct));
+  const axis = document.createElement("div"); axis.className="axis";
+  axis.style.setProperty("--tickh", (DATA.overall.length*36)+"px");
+  for(let t=0;t<=AXIS_MAX;t+=10){ const tk=document.createElement("div"); tk.className="tick"; tk.style.left=(t/AXIS_MAX*100)+"%"; tk.innerHTML=`<span>${t}</span><i></i>`; axis.appendChild(tk); }
+  chart.appendChild(axis);
+  DATA.overall.forEach(d=>{
+    const row=document.createElement("div"); row.className="row"+(d.pct===maxPct?" hi":""); row.tabIndex=0;
+    row.style.setProperty("--w",(d.pct/AXIS_MAX*100)+"%"); row.style.setProperty("--t",(d.pct/maxPct).toFixed(3));
+    row.innerHTML=`<div class="name"><span>${d.name}</span><span class="cat">${d.cat}</span></div><div class="track"><div class="barwrap"><div class="bar"></div><span class="val">${d.pct}%</span></div></div>`;
+    const html=`<div class="tname">${d.name}</div><div><span class="tpct">${d.pct}%</span> of ${d.base.split(" · ")[0]}${d.count!=="—"?` &middot; ${d.count}`:``}</div><div class="tmeta">${d.cat} &middot; ${d.src}<br>${d.base}</div>`;
+    row.addEventListener("mousemove",e=>showTip(e,html)); row.addEventListener("mouseleave",hideTip);
+    row.addEventListener("focus",()=>{const r=row.getBoundingClientRect();showTip({clientX:r.left+r.width*.45,clientY:r.top+r.height},html);}); row.addEventListener("blur",hideTip);
+    chart.appendChild(row);
+  });
+  const tw=document.getElementById("tablewrap");
+  tw.innerHTML=`<table><thead><tr><th>Condition</th><th>Category</th><th>Prevalence</th><th>People</th><th>Base</th><th>Source</th></tr></thead><tbody>${DATA.overall.map(d=>`<tr><td>${d.name}</td><td>${d.cat}</td><td class="n">${d.pct}%</td><td class="n">${d.count}</td><td>${d.base}</td><td>${d.src}</td></tr>`).join("")}</tbody></table>`;
+  const btn=document.getElementById("tbl-toggle");
+  btn.addEventListener("click",()=>{const on=tw.classList.toggle("on");btn.setAttribute("aria-expanded",on);btn.textContent=on?"Hide data table":"Show data table";});
+})();
+
+/* ---------- AGE ---------- */
+(function(){
+  const grid=document.getElementById("age-grid");
+  DATA.age.conditions.forEach(c=>{
+    const mx=Math.max(...c.pts.map(p=>p[1]));
+    const bars=c.pts.map(p=>{
+      const t=(p[1]/mx).toFixed(3), h=(p[1]/mx*100).toFixed(1);
+      return `<div class="agebar"><div class="av">${p[1]}%</div><div class="col" style="height:${h}%;--t:${t}"></div><div class="al"><b>${p[0]}</b></div></div>`;
+    }).join("");
+    const card=document.createElement("div"); card.className="agecard";
+    card.innerHTML=`<h3>${c.name}</h3><div class="csrc">${c.src}</div><div class="agebars">${bars}</div>`;
+    grid.appendChild(card);
+  });
+})();
+
+/* ---------- TREND ---------- */
+(function(){
+  const grid=document.getElementById("trend-grid");
+  const order=Object.keys(DATA.trend).sort((a,b)=>{const A=DATA.trend[a].series,B=DATA.trend[b].series;return Object.values(B).pop()-Object.values(A).pop();});
+  order.forEach(k=>{
+    const s=DATA.trend[k].series, yrs=Object.keys(s).sort(), vals=yrs.map(y=>s[y]);
+    const n=vals.length, mn=Math.min(...vals), mx=Math.max(...vals), rng=(mx-mn)||1;
+    const W=100,H=40,pad=5;
+    const X=i=>(n===1?W/2:(i/(n-1))*W);
+    const Y=v=>H-pad-((v-mn)/rng)*(H-2*pad);
+    const pts=vals.map((v,i)=>[X(i),Y(v)]);
+    const path=pts.map((p,i)=>(i?"L":"M")+p[0].toFixed(1)+" "+p[1].toFixed(1)).join(" ");
+    const first=vals[0], last=vals[n-1], delta=(last-first);
+    const dcls=delta>0.05?"up":(delta<-0.05?"dn":"");
+    const darrow=delta>0.05?"▲":(delta<-0.05?"▼":"—");
+    const dots=pts.map((p,i)=>`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="2.6" fill="var(--accent)" data-y="${yrs[i]}" data-v="${vals[i]}" style="cursor:pointer"/>`).join("");
+    const card=document.createElement("div"); card.className="sm";
+    card.innerHTML=`<div class="top"><span class="lbl">${DATA.trend[k].label}</span><span class="now">${last}%</span></div>`+
+      `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"><polyline points="${pts.map(p=>p[0].toFixed(1)+","+p[1].toFixed(1)).join(" ")}" fill="none" stroke="var(--accent)" stroke-width="1.6" vector-effect="non-scaling-stroke" stroke-linejoin="round" stroke-linecap="round"/>${dots}</svg>`+
+      `<div class="foot"><span>${yrs[0]}</span><span class="delta ${dcls}">${darrow} ${delta>0?"+":""}${delta.toFixed(1)} pts</span><span>${yrs[n-1]}</span></div>`;
+    card.querySelectorAll("circle").forEach(c=>{
+      c.addEventListener("mousemove",e=>showTip(e,`<div class="tname">${DATA.trend[k].label}</div><div class="tpct">${c.dataset.v}%</div><div class="tmeta">${c.dataset.y} &middot; BRFSS self-reported</div>`));
+      c.addEventListener("mouseleave",hideTip);
+    });
+    grid.appendChild(card);
+  });
+})();
+
+/* ---------- STATE ---------- */
+(function(){
+  const sel=document.getElementById("state-selector"), map=document.getElementById("tilemap"),
+        meta=document.getElementById("map-meta"), list=document.getElementById("state-list"),
+        slo=document.getElementById("scale-lo"), shi=document.getElementById("scale-hi"),
+        sexSel=document.getElementById("sex-selector");
+  const keys=Object.keys(DATA.state);
+  let active=keys[0], sex="all";
+  const SEXLBL={all:"Everyone",Female:"Women",Male:"Men"};
+  keys.forEach(k=>{
+    const b=document.createElement("button"); b.className="chip"; b.textContent=DATA.state[k].label;
+    b.setAttribute("aria-pressed",k===active); b.dataset.k=k;
+    b.addEventListener("click",()=>{active=k;[...sel.children].forEach(c=>c.setAttribute("aria-pressed",c.dataset.k===k));render();});
+    sel.appendChild(b);
+  });
+  [...sexSel.children].forEach(b=>b.addEventListener("click",()=>{
+    sex=b.dataset.sex; [...sexSel.children].forEach(c=>c.setAttribute("aria-pressed",c.dataset.sex===sex)); render();
+  }));
+  function currentVals(rec){ return sex==="all" ? rec.values : (rec.sex ? rec.sex[sex] : {}); }
+  function render(){
+    const rec=DATA.state[active], vals=currentVals(rec);
+    const ks=Object.keys(vals); const nums=ks.map(s=>vals[s]);
+    const mn=Math.min(...nums), mx=Math.max(...nums), rng=(mx-mn)||1;
+    const hiS=ks.reduce((a,b)=>vals[b]>vals[a]?b:a), loS=ks.reduce((a,b)=>vals[b]<vals[a]?b:a);
+    const avgTxt = sex==="all" ? `<span>U.S. avg <b>${rec.us}%</b></span>` : `<span>Showing <b>${SEXLBL[sex]}</b></span>`;
+    meta.innerHTML=`${avgTxt}<span>Highest <b>${STNAME[hiS]} ${vals[hiS]}%</b></span><span>Lowest <b>${STNAME[loS]} ${vals[loS]}%</b></span><span style="color:var(--faint)">BRFSS ${rec.year}</span>`;
+    slo.textContent=mn.toFixed(0)+"%"; shi.textContent=mx.toFixed(0)+"%";
+    map.innerHTML="";
+    Object.keys(DATA.tilegrid).forEach(st=>{
+      const [r,c]=DATA.tilegrid[st], v=vals[st];
+      const tile=document.createElement("div"); tile.style.gridRow=(r+1); tile.style.gridColumn=(c+1);
+      tile.textContent=st;
+      if(v==null){ tile.className="tile na"; tile.title=STNAME[st]+" — no data"; }
+      else{
+        const t=(v-mn)/rng; tile.className="tile";
+        tile.style.background=`color-mix(in oklab, var(--bar-hi), var(--bar-lo) ${((1-t)*100).toFixed(1)}%)`;
+        if(t<0.32) tile.style.color="var(--ink)";
+        const ref = sex==="all" ? `${v>rec.us?"above":"below"} U.S. avg (${rec.us}%)` : SEXLBL[sex];
+        const html=`<div class="tname">${STNAME[st]}</div><div><span class="tpct">${v}%</span></div><div class="tmeta">${rec.label} &middot; ${ref}</div>`;
+        tile.addEventListener("mousemove",e=>showTip(e,html)); tile.addEventListener("mouseleave",hideTip);
+      }
+      map.appendChild(tile);
+    });
+    const sorted=ks.slice().sort((a,b)=>vals[b]-vals[a]);
+    list.innerHTML=sorted.map(st=>{const t=((vals[st]-mn)/rng).toFixed(3),w=((vals[st]-mn)/rng*100).toFixed(1);
+      return `<div class="srow"><span class="sn">${st}</span><div class="strack"><div class="sbar" style="--w:${Math.max(w,4)}%;--t:${t}"></div></div><span class="sv">${vals[st]}%</span></div>`;}).join("");
+    STATE_CTX={condId:active, sex, rec, vals, label:rec.label, mn, mx, rng, hiS, loS};
+  }
+  render();
+})();
+
+/* ---------- REALTIME ---------- */
+(function(){
+  const rt=DATA.realtime;
+  document.getElementById("rt-banner").innerHTML=`<b>As of ${rt.asof}:</b> ${rt.overall} <span style="color:var(--muted)">· ${rt.cadence}</span>`;
+  document.getElementById("rt-grid").innerHTML=rt.items.map(it=>`<div class="rtcard"><div class="rn">${it.name}</div><span class="pill ${it.tone}">${it.level}</span><div class="rnote">${it.note}</div></div>`).join("");
+})();
+
+/* ---------- TABS ---------- */
+(function(){
+  const tabs=[...document.querySelectorAll(".tab")];
+  tabs.forEach(t=>t.addEventListener("click",()=>{
+    tabs.forEach(x=>x.setAttribute("aria-selected",x===t));
+    document.querySelectorAll(".view").forEach(v=>v.classList.remove("on"));
+    document.getElementById("view-"+t.dataset.view).classList.add("on");
+    ACTIVE_VIEW=t.dataset.view;
+    if(window.__syncDL) window.__syncDL();
+    hideTip();
+  }));
+})();
+
+/* ---------- DOWNLOADS (CSV + PNG) ---------- */
+(function(){
+  const csvBtn=document.getElementById("dl-csv"), pngBtn=document.getElementById("dl-png"),
+        status=document.getElementById("dl-status"), toolbar=document.getElementById("dl-toolbar");
+  const has = window.claude && window.claude.downloads;
+  if(!has){ toolbar.style.display="none"; }
+  function cssv(n){ return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+  function say(msg,err){ status.textContent=msg; status.className="dl-status"+(err?" err":""); if(msg) setTimeout(()=>{if(status.textContent===msg)status.textContent="";},4000); }
+
+  async function save(filename, data){
+    try{ await window.claude.downloads.save({filename,data}); say("Saved ✓"); }
+    catch(e){
+      const c=e&&e.code;
+      if(c==="declined") say("Download canceled");
+      else if(c==="extension_not_enabled" && filename.endsWith(".csv")){
+        try{ await window.claude.downloads.save({filename:filename.replace(/\.csv$/,".txt"),data}); say("Saved as .txt ✓"); }
+        catch(e2){ say("Couldn't save ("+((e2&&e2.code)||"error")+")",true); }
+      }
+      else if(c==="rate_limited") say("Please wait a moment, then retry",true);
+      else say("Couldn't save ("+(c||"error")+")",true);
+    }
+  }
+  const q=s=>{s=(s==null?"":String(s)); return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;};
+  const rows2csv=rows=>rows.map(r=>r.map(q).join(",")).join("\r\n");
+
+  // ---- CSV per view ----
+  function csvFor(view){
+    if(view==="overall"){
+      const r=[["Condition","Category","Prevalence_pct","People","Population_base","Source"]];
+      DATA.overall.forEach(d=>r.push([d.name,d.cat,d.pct,d.count,d.base,d.src]));
+      return {name:"us-health_overall-prevalence.csv",data:rows2csv(r)};
+    }
+    if(view==="age"){
+      const r=[["Condition","Age_band","Prevalence_pct","Source"]];
+      DATA.age.conditions.forEach(c=>c.pts.forEach(p=>r.push([c.name,p[0],p[1],c.src])));
+      return {name:"us-health_by-age.csv",data:rows2csv(r)};
+    }
+    if(view==="trend"){
+      const r=[["Condition","Year","Prevalence_pct","Source"]];
+      Object.values(DATA.trend).forEach(t=>Object.keys(t.series).sort().forEach(y=>r.push([t.label,y,t.series[y],"CDC BRFSS (self-reported)"])));
+      return {name:"us-health_trends.csv",data:rows2csv(r)};
+    }
+    if(view==="state"){
+      const cx=STATE_CTX; const sx=cx.sex==="all"?"Everyone":cx.sex;
+      const r=[["State_abbr","State","Condition","Breakdown","Prevalence_pct","Year","Source"]];
+      Object.keys(cx.vals).sort((a,b)=>cx.vals[b]-cx.vals[a]).forEach(st=>
+        r.push([st,STNAME[st],cx.label,sx,cx.vals[st],cx.rec.year,"CDC BRFSS / DNPAO"]));
+      return {name:`us-health_state_${cx.condId.toLowerCase()}_${sx.toLowerCase()}.csv`,data:rows2csv(r)};
+    }
+    if(view==="realtime"){
+      const r=[["Virus","Level","Note","As_of","Source"]];
+      DATA.realtime.items.forEach(it=>r.push([it.name,it.level,it.note,DATA.realtime.asof,"CDC Respiratory Illnesses Data Channel"]));
+      return {name:"us-health_realtime-respiratory.csv",data:rows2csv(r)};
+    }
+  }
+
+  // ---- PNG per view (Canvas 2D, theme-aware, hi-DPI) ----
+  const F="'Helvetica Neue',Arial,sans-serif";
+  function ramp(t){ // approx of color-mix bar-lo..bar-hi in sRGB
+    const lo=hex(cssv("--bar-lo")), hi=hex(cssv("--bar-hi"));
+    const m=(a,b)=>Math.round(a+(b-a)*t);
+    return `rgb(${m(lo[0],hi[0])},${m(lo[1],hi[1])},${m(lo[2],hi[2])})`;
+  }
+  function hex(h){ h=h.replace('#',''); if(h.length===3)h=h.split('').map(x=>x+x).join(''); return [parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)]; }
+  function newCanvas(w,h){ const dpr=Math.max(2,window.devicePixelRatio||1); const cv=document.createElement("canvas"); cv.width=w*dpr; cv.height=h*dpr; const cx=cv.getContext("2d"); cx.scale(dpr,dpr); return {cv,cx,w,h}; }
+  function bg(cx,w,h){ cx.fillStyle=cssv("--panel"); cx.fillRect(0,0,w,h); }
+  function heading(cx,title,sub,w){ cx.textBaseline="alphabetic";
+    cx.fillStyle=cssv("--ink"); cx.font=`600 22px Georgia,serif`; cx.fillText(title,36,46);
+    cx.fillStyle=cssv("--muted"); cx.font=`13px ${F}`; cx.fillText(sub,36,68);
+  }
+  function footer(cx,w,h){ cx.fillStyle=cssv("--faint"); cx.font=`11px ${F}`; cx.fillText("Source: CDC / SAMHSA / NCI · The State of America's Health",36,h-16); }
+
+  function pngOverall(){
+    const items=DATA.overall, rowH=30, top=100, w=900, h=top+items.length*rowH+50;
+    const {cv,cx}=newCanvas(w,h); bg(cx,w,h);
+    heading(cx,"Prevalence among U.S. adults","Share of adults 18+ living with each condition (%)",w);
+    const labW=210, x0=36+labW, plotW=w-x0-70, max=50, mxv=Math.max(...items.map(d=>d.pct));
+    cx.strokeStyle=cssv("--hairline"); cx.lineWidth=1;
+    for(let t=0;t<=max;t+=10){ const x=x0+t/max*plotW; cx.beginPath(); cx.moveTo(x,top-8); cx.lineTo(x,top+items.length*rowH); cx.stroke(); cx.fillStyle=cssv("--faint"); cx.font=`11px ${F}`; cx.textAlign="center"; cx.fillText(t,x,top-14); }
+    cx.textAlign="left";
+    items.forEach((d,i)=>{ const y=top+i*rowH, bw=d.pct/max*plotW, t=d.pct/mxv;
+      cx.fillStyle=cssv("--ink-soft"); cx.font=`600 13px ${F}`; cx.textAlign="right"; cx.fillText(d.name,36+labW-12,y+18);
+      cx.textAlign="left"; cx.fillStyle=ramp(t); roundRect(cx,x0,y+6,Math.max(bw,2),18,4); cx.fill();
+      cx.fillStyle=cssv("--ink-soft"); cx.font=`700 12px ${F}`; cx.fillText(d.pct+"%",x0+bw+8,y+19);
+    });
+    footer(cx,w,h); return {cv,name:"us-health_overall.png"};
+  }
+  function pngAge(){
+    const conds=DATA.age.conditions, w=900, colW=w/conds.length, h=430, top=110, base=h-70, bh=base-top;
+    const {cv,cx}=newCanvas(w,h); bg(cx,w,h);
+    heading(cx,"How prevalence shifts with age","Prevalence by age band (%)",w);
+    conds.forEach((c,ci)=>{ const cx0=ci*colW+40, cw=colW-80, mx=Math.max(...c.pts.map(p=>p[1]));
+      cx.fillStyle=cssv("--ink"); cx.font=`600 14px ${F}`; cx.textAlign="left"; cx.fillText(c.name,cx0,top-14);
+      const n=c.pts.length, gap=12, barW=(cw-gap*(n-1))/n;
+      c.pts.forEach((p,i)=>{ const x=cx0+i*(barW+gap), bh2=p[1]/mx*bh, y=base-bh2, t=p[1]/mx;
+        cx.fillStyle=ramp(t); roundRect(cx,x,y,barW,bh2,5); cx.fill();
+        cx.fillStyle=cssv("--ink-soft"); cx.font=`700 12px ${F}`; cx.textAlign="center"; cx.fillText(p[1]+"%",x+barW/2,y-6);
+        cx.fillStyle=cssv("--muted"); cx.font=`11px ${F}`; cx.fillText(p[0],x+barW/2,base+18);
+      });
+    });
+    cx.textAlign="left"; footer(cx,w,h); return {cv,name:"us-health_by-age.png"};
+  }
+  function pngTrend(){
+    const ent=Object.values(DATA.trend), cols=3, rows=Math.ceil(ent.length/cols),
+          w=900, cardW=w/cols, cardH=150, top=100, h=top+rows*cardH+40;
+    const {cv,cx}=newCanvas(w,h); bg(cx,w,h);
+    heading(cx,"The trend over time","Self-reported prevalence, CDC BRFSS (%)",w);
+    ent.forEach((t,i)=>{ const cxx=(i%cols)*cardW+40, cyy=top+Math.floor(i/cols)*cardH,
+      pw=cardW-80, ph=70, yrs=Object.keys(t.series).sort(), vals=yrs.map(y=>t.series[y]),
+      mn=Math.min(...vals), mx=Math.max(...vals), rng=(mx-mn)||1, n=vals.length;
+      cx.fillStyle=cssv("--ink"); cx.font=`600 13px ${F}`; cx.textAlign="left"; cx.fillText(t.label,cxx,cyy+16);
+      cx.fillStyle=cssv("--accent"); cx.font=`700 15px ${F}`; cx.textAlign="right"; cx.fillText(vals[n-1]+"%",cxx+pw,cyy+16);
+      const gy=cyy+30, gx=cxx; cx.strokeStyle=cssv("--accent"); cx.lineWidth=2; cx.beginPath();
+      vals.forEach((v,j)=>{ const px=gx+(n===1?pw/2:j/(n-1)*pw), py=gy+ph-(v-mn)/rng*ph; j?cx.lineTo(px,py):cx.moveTo(px,py); }); cx.stroke();
+      const lx=gx+pw, ly=gy+ph-(vals[n-1]-mn)/rng*ph; cx.fillStyle=cssv("--accent"); cx.beginPath(); cx.arc(lx,ly,3.5,0,7); cx.fill();
+      cx.fillStyle=cssv("--faint"); cx.font=`10px ${F}`; cx.textAlign="left"; cx.fillText(yrs[0],gx,gy+ph+16); cx.textAlign="right"; cx.fillText(yrs[n-1],gx+pw,gy+ph+16);
+    });
+    cx.textAlign="left"; footer(cx,w,h); return {cv,name:"us-health_trends.png"};
+  }
+  function pngState(){
+    const cx0=STATE_CTX, vals=cx0.vals, w=900, h=620, top=120;
+    const {cv,cx}=newCanvas(w,h); bg(cx,w,h);
+    const sx=cx0.sex==="all"?"Everyone":cx0.sex;
+    heading(cx,cx0.label+" by state",`CDC BRFSS ${cx0.rec.year} · ${sx} · darker = higher (%)`,w);
+    const cell=52, gap=6, gx=40, gy=top;
+    Object.keys(DATA.tilegrid).forEach(st=>{ const [r,c]=DATA.tilegrid[st], v=vals[st];
+      const x=gx+c*(cell+gap), y=gy+r*(cell+gap);
+      if(v==null){ cx.fillStyle=cssv("--panel-2"); roundRect(cx,x,y,cell,cell,5); cx.fill(); cx.strokeStyle=cssv("--hairline"); cx.stroke(); cx.fillStyle=cssv("--faint"); }
+      else{ const t=(v-cx0.mn)/cx0.rng; cx.fillStyle=ramp(t); roundRect(cx,x,y,cell,cell,5); cx.fill(); cx.fillStyle=t<0.32?cssv("--ink"):"#fff"; }
+      cx.font=`700 11px ${F}`; cx.textAlign="center"; cx.fillText(st,x+cell/2,y+cell/2-2);
+      if(v!=null){ cx.font=`10px ${F}`; cx.fillText(v+"%",x+cell/2,y+cell/2+12); }
+    });
+    cx.textAlign="left"; cx.fillStyle=cssv("--ink-soft"); cx.font=`13px ${F}`;
+    cx.fillText(`Highest: ${STNAME[cx0.hiS]} ${vals[cx0.hiS]}%   ·   Lowest: ${STNAME[cx0.loS]} ${vals[cx0.loS]}%`,40,h-46);
+    footer(cx,w,h); return {cv,name:`us-health_state_${cx0.condId.toLowerCase()}_${sx.toLowerCase()}.png`};
+  }
+  function pngRealtime(){
+    const rt=DATA.realtime, w=900, h=300; const {cv,cx}=newCanvas(w,h); bg(cx,w,h);
+    heading(cx,"Real-time respiratory surveillance","As of "+rt.asof+" · "+rt.cadence,w);
+    const n=rt.items.length, cardW=(w-80-(n-1)*16)/n;
+    rt.items.forEach((it,i)=>{ const x=40+i*(cardW+16), y=100;
+      cx.fillStyle=cssv("--panel-2"); roundRect(cx,x,y,cardW,140,10); cx.fill();
+      cx.fillStyle=cssv("--ink"); cx.font=`700 16px ${F}`; cx.textAlign="left"; cx.fillText(it.name,x+16,y+30);
+      cx.fillStyle=cssv("--good"); cx.beginPath(); cx.arc(x+22,y+52,5,0,7); cx.fill();
+      cx.font=`700 13px ${F}`; cx.fillText(it.level,x+34,y+56);
+      cx.fillStyle=cssv("--muted"); cx.font=`11px ${F}`; wrap(cx,it.note,x+16,y+80,cardW-32,15);
+    });
+    footer(cx,w,h); return {cv,name:"us-health_realtime.png"};
+  }
+  function wrap(cx,text,x,y,maxw,lh){ const words=text.split(" "); let line="",yy=y;
+    words.forEach(wd=>{ const test=line?line+" "+wd:wd; if(cx.measureText(test).width>maxw){ cx.fillText(line,x,yy); line=wd; yy+=lh; } else line=test; }); cx.fillText(line,x,yy); }
+  function roundRect(cx,x,y,w,h,r){ r=Math.min(r,w/2,h/2); cx.beginPath(); cx.moveTo(x+r,y); cx.arcTo(x+w,y,x+w,y+h,r); cx.arcTo(x+w,y+h,x,y+h,r); cx.arcTo(x,y+h,x,y,r); cx.arcTo(x,y,x+w,y,r); cx.closePath(); }
+
+  const PNG={overall:pngOverall,age:pngAge,trend:pngTrend,state:pngState,realtime:pngRealtime};
+
+  csvBtn.addEventListener("click",()=>{ const o=csvFor(ACTIVE_VIEW); if(o) save(o.name,o.data); });
+  pngBtn.addEventListener("click",()=>{
+    const gen=PNG[ACTIVE_VIEW]; if(!gen) return;
+    const {cv,name}=gen();
+    cv.toBlob(b=>{ if(!b){say("Couldn't render image",true);return;} save(name,b); },"image/png");
+  });
+
+  window.__syncDL=function(){ status.textContent=""; status.className="dl-status"; };
+  window.__dltest={PNG,csvFor}; // smoke-test hook
+})();
+</script>
