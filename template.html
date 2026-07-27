@@ -500,23 +500,38 @@ function hideTip(){ tip.classList.remove("on"); }
 (function(){
   const csvBtn=document.getElementById("dl-csv"), pngBtn=document.getElementById("dl-png"),
         status=document.getElementById("dl-status"), toolbar=document.getElementById("dl-toolbar");
-  const has = window.claude && window.claude.downloads;
-  if(!has){ toolbar.style.display="none"; }
+  const has = window.claude && window.claude.downloads;   // claude.ai artifact runtime
+  // Toolbar is always shown: on a normal website we fall back to a standard browser download.
   function cssv(n){ return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
   function say(msg,err){ status.textContent=msg; status.className="dl-status"+(err?" err":""); if(msg) setTimeout(()=>{if(status.textContent===msg)status.textContent="";},4000); }
 
+  function browserSave(filename, data){
+    try{
+      const type = filename.endsWith(".png") ? "image/png" : (filename.endsWith(".csv") ? "text/csv" : "text/plain");
+      const blob = (data instanceof Blob) ? data : new Blob([data], {type});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a"); a.href = url; a.download = filename;
+      document.body.appendChild(a); a.click();
+      setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); }, 1500);
+      say("Downloaded ✓");
+    }catch(e){ say("Couldn't download ("+(e.message||"error")+")",true); }
+  }
+
   async function save(filename, data){
-    try{ await window.claude.downloads.save({filename,data}); say("Saved ✓"); }
-    catch(e){
-      const c=e&&e.code;
-      if(c==="declined") say("Download canceled");
-      else if(c==="extension_not_enabled" && filename.endsWith(".csv")){
-        try{ await window.claude.downloads.save({filename:filename.replace(/\.csv$/,".txt"),data}); say("Saved as .txt ✓"); }
-        catch(e2){ say("Couldn't save ("+((e2&&e2.code)||"error")+")",true); }
+    if(has){
+      try{ await window.claude.downloads.save({filename,data}); say("Saved ✓"); return; }
+      catch(e){
+        const c=e&&e.code;
+        if(c==="declined"){ say("Download canceled"); return; }
+        if(c==="extension_not_enabled" && filename.endsWith(".csv")){
+          try{ await window.claude.downloads.save({filename:filename.replace(/\.csv$/,".txt"),data}); say("Saved as .txt ✓"); return; }
+          catch(e2){ /* fall through to browser download */ }
+        }
+        if(c==="rate_limited"){ say("Please wait a moment, then retry",true); return; }
+        // any other failure: fall back to a standard browser download
       }
-      else if(c==="rate_limited") say("Please wait a moment, then retry",true);
-      else say("Couldn't save ("+(c||"error")+")",true);
     }
+    browserSave(filename, data);
   }
   const q=s=>{s=(s==null?"":String(s)); return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;};
   const rows2csv=rows=>rows.map(r=>r.map(q).join(",")).join("\r\n");
